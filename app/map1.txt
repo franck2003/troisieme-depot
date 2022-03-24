@@ -29,4 +29,4 @@ you 3 9
 text_flag 5 9
 is 6 9
 win 7 9
-baba 2 5 3
+baba 1 5 3
