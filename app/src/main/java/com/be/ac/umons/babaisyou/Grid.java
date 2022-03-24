@@ -11,7 +11,7 @@ public class Grid {
     Position pos;
     ArrayList<Entities>[][] grid;
 
-    
+
 
     public Grid(String map) throws IOException {// constructeur qui permet de definir le plateau ou la grille qui est un tableau a 2 dimension d'entities
         String line;
