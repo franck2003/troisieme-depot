@@ -15,6 +15,7 @@ wall 7 3
 rock 4 4 0
 rock 4 5 2
 rock 4 6 1
+baba 2 5 3
 flag 6 5 1
 wall 1 7
 wall 2 7
@@ -29,4 +30,3 @@ you 3 9
 text_flag 5 9
 is 6 9
 win 7 9
-baba 1 5 3
