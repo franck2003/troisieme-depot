@@ -21,27 +21,22 @@ public class Windows extends Application {
     public void start(Stage stage) {
         try {
             GridPane root = new GridPane();//ensemble dans lequel on va stoker nos composants
-            Scene scene = new Scene(root, 480,480, Color.BLACK);
+            Scene scene = new Scene(root, 600,600, Color.BLACK);
             Grid grille = new Grid("map1.txt");
             Image image ;
             ImageView imageView;
             for(int i=0; i<grille.grid.length;i++){
                 for(int j=0; j<grille.grid[i].length;j++){
                     if (grille.grid[i][j]!=null){
-                        image = new Image(new FileInputStream("D:\\projet_baba_is_you_new\\app\\src\\main\\java\\com\\be\\ac\\umons\\babaisyou\\Graphique\\Image\\baba.png"));
-                        imageView = new ImageView(image);
-                        for(Entities args:grille.grid[i][j])
-                        root.add(imageView,args.position.row,args.position.col);
-                    }else{
-                        image = new Image(new FileInputStream("D:\\projet_baba_is_you_new\\app\\src\\main\\java\\com\\be\\ac\\umons\\babaisyou\\Graphique\\Image\\test_baba.png"));
-                        imageView = new ImageView(image);
-                        root.add(imageView,i,j);
+                        for(Entities args:grille.grid[i][j]) {
+                            image = new Image(new FileInputStream(args.block.getPath()));
+                            imageView = new ImageView(image);
+                            root.add(imageView, args.position.row, args.position.col);
+                        }
                     }
                 }
             }
-
             root.setAlignment(Pos.CENTER);
-
             stage.setTitle("Hello!");
             // platform.exit() permet de fermer l'application etb pour cela il faut import platform de la classe application(javafx.application.platform)
             stage.setScene(scene);

@@ -13,6 +13,7 @@ public enum Property {
     flag('!');
 
     private final Object values;
+
     Property(Object values){
         this.values = values;
     }

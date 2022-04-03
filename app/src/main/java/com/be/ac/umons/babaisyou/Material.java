@@ -1,8 +1,8 @@
 package com.be.ac.umons.babaisyou;
 
 public enum Material {
-    test_baba('B'),
-    test_rock('R'),
+    test_baba('B'),// un enum pour tous mes entities
+    test_rock('R'),// ajouter un autre auttribtut pour le shemin de mes materiaux
     test_wall('W'),
     test_flag('F'),
     test_water('E'),
@@ -10,7 +10,7 @@ public enum Material {
 
     private final char charactere;
 
-    Material(char charactere) {// define a  word his description and charactere
+    Material(char charactere) {// define a  word his description and charactere...
         this.charactere = charactere;
     }
 

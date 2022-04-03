@@ -1,6 +1,7 @@
 package com.be.ac.umons.babaisyou.Graphique;
 
 public enum Size {
+
     /*SMALL(32, 20, 32),
     MEDIUM(48, 14,23),
     LARGE(64, 11,17);
