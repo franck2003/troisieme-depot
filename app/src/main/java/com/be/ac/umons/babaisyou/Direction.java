@@ -14,14 +14,4 @@ public enum Direction {
         this.x = x;
         this.y = y;
     }
-
-    public static Direction match(String mov) {
-        return switch (mov) {
-            case "w" -> Direction.UP;
-            case "s" -> Direction.LEFT;
-            case "a" -> Direction.DOWN;
-            case "d" -> Direction.RIGHT;
-            default -> null;
-        };
-    }
 }

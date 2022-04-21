@@ -1,22 +1,19 @@
 package com.be.ac.umons.babaisyou;
 
+import com.be.ac.umons.babaisyou.Graphique.Windows;
 import com.be.ac.umons.babaisyou.rules.Rule;
+import javafx.scene.image.ImageView;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.ArrayList;
+import java.util.*;
 //import static com.be.ac.umons.babaisyou.rules.Rule.isValid;
 
 public class Grid {
 
     Position pos;
-    public ArrayList<Entities>[][] grid;
-    ArrayList<Rule> obj = new ArrayList<Rule>();
-    /*
-     ArrayList<ArrayList<Arraylist<Entities>>> ref = new ArrayList<ArraylistArraylist<Entities>>();
-     1
-     */
+    private ArrayList<Entities>[][] grid;
 
     public Grid(String map) throws IOException {// constructeur qui permet de definir le plateau ou la grille qui est un tableau a 2 dimension d'entities
         String line;
@@ -42,11 +39,22 @@ public class Grid {
                     ;
                 }
             }
+            for (int i = 0; i < this.grid.length; i++) {
+                for (int j = 0; j < this.grid[i].length; j++) {
+                    if (this.grid[i][j] == null) {
+                        this.grid[i][j] = new ArrayList<Entities>();
+                    }
+                }
+            }
         }
         /*obj = therule();
         for (Rule args:obj){
             System.out.println(args.first+" "+args.second+" "+args.third);
         }*/
+    }
+
+    public ArrayList<Entities>[][] getGrid(){
+        return this.grid;
     }
 
     public int getRow() {
@@ -58,24 +66,7 @@ public class Grid {
     }
 
     public Words getWords(String s) {
-        return switch (s) {
-            case "text_baba" -> Words.test_baba;
-            case "text_rock" -> Words.test_rock;
-            case "text_wall" -> Words.test_wall;
-            case "text_flag" -> Words.test_flag;
-            case "is" -> Words.is;
-            case "you" -> Words.you;
-            case "wall" -> Words.wall;
-            case "stop" -> Words.stop;
-            case "rock" -> Words.rock;
-            case "win" -> Words.win;
-            case "baba" -> Words.baba;
-            case "push" -> Words.push;
-            case "flag" -> Words.flag;
-            case "lava" -> Words.lava;
-            case "water" -> Words.water;
-            default -> null;
-        };
+        return Words.valueOf(s);
     }
 
     public Entities getEntitities(int x, int y) {
@@ -89,95 +80,158 @@ public class Grid {
         return null;
     }
 
-    public ArrayList<Rule> getRules() {
-        ArrayList<Rule> rules = new ArrayList<Rule>();
-        Rule tmp;
-        for (int i = 0; i < getRow(); i++) {
-            for (int j = 0; j < getCol(); j++) {
-                for (Entities second : this.grid[i][j]) {
-                    if (second.block.equals(Words.is)) {
-                        for (Entities first : this.grid[i - 1][j]) {
-                            for (Entities third : this.grid[i + 1][j]) {
-                                if (Rule.isValid(first.block, second.block, third.block)) {
-                                    tmp = new Rule(first.block, second.block, third.block);
-                                    rules.add(tmp);
-                                }
-                            }
-                        }
-                        for (Entities first : this.grid[i][j - 1]) {
-                            for (Entities third : this.grid[i][j + 1]) {
-                                if (Rule.isValid(first.block, second.block, third.block)) {
-                                    tmp = new Rule(first.block, second.block, third.block);
-                                    rules.add(tmp);
-                                }
-                            }
-                        }
+    public void removeEntities(int i, int j, Entities entities) {
+        this.grid[i][j].remove(entities);
+    }
 
+    public void setEntities(int i, int j, Entities entities) {
+        this.grid[i][j].add(entities);
+    }
+
+    public ArrayList<Entities> getIs() {
+        ArrayList<Entities> list = new ArrayList<Entities>();
+        int cpt = 0;
+        for (ArrayList<Entities>[] arrayLists : this.grid) {
+            for (ArrayList<Entities> arrayList : arrayLists) {
+                if (arrayList != null) {
+                    for (Entities args : arrayList) {
+                        if (args.block.equals(Words.is)) {
+                            list.add(args);
+                            break;
+                        }
                     }
                 }
             }
+        }
+        return list;
+    }
+
+    public ArrayList<Rule> getRules() {
+        ArrayList<Rule> rules = new ArrayList<Rule>();
+        List<Entities> list = getIs();
+        for (Entities second : list) {
+            if (this.grid[second.position.row - 1][second.position.col].size() != 0 && this.grid[second.position.row + 1][second.position.col].size() != 0) {
+                for (Entities first : this.grid[second.position.row - 1][second.position.col]) {
+                    for (Entities third : this.grid[second.position.row + 1][second.position.col]) {
+                        if (Rule.isValid(first.block, second.block, third.block)) {
+                            rules.add(new Rule(first.block, second.block, third.block));
+                        }
+                    }
+                }
+            }
+            if (this.grid[second.position.row][second.position.col - 1].size() != 0 || this.grid[second.position.row][second.position.col + 1].size() != 0) {
+                for (Entities first : this.grid[second.position.row][second.position.col - 1]) {
+                    for (Entities third : this.grid[second.position.row][second.position.col + 1]) {
+                        if (Rule.isValid(first.block, second.block, third.block)) {
+                            rules.add(new Rule(first.block, second.block, third.block));
+                        }
+                    }
+                }
+            }
+            /*for(Rule args:rules){
+                System.out.print(args.first+" ");
+                System.out.print(args.second+" ");
+                System.out.print(args.third+" ");
+                System.out.println();
+            }*/
+
         }
         return rules;
     }
+
+
+    public boolean ingrid(int i, int j) {
+        return i < getRow() && j < getCol() && i >= 0 && j >= 0;
+    }
+
+    public boolean IsBlock(int i, int j) {
+        ArrayList<Rule> rules = getRules();
+        Words rock = null;
+        for (Rule args : rules) {
+            if (args.first.equals(Words.push)) {
+                rock = args.first;
+            }
+        }
+        for (Entities args : this.grid[i][j]) {
+            if (args.block.equals(rock)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public boolean push(Entities ref, Direction dir) {
+        ArrayList<Rule> rules = this.getRules();
+        Words wall = null;
+        Words rock = null;
+        boolean isPush = true;
+        for (Rule args : rules) {
+            if (args.third.equals(Words.stop)) {
+                wall = Words.valueOf(args.first.getName().toLowerCase());
+            }
+            if (args.third.equals(Words.push)) {
+                rock = Words.valueOf(args.first.getName().toLowerCase());
+            }
+        }
+            if (!ingrid(ref.position.row + dir.x, ref.position.col + dir.y)) {
+                return false;
+            }
+            for (Entities args : this.grid[ref.position.row + dir.x][ref.position.col + dir.y]) {
+                if (args.block.equals(wall)) {
+                    return false;
+                }
+            }
+            for (int i = 0; i < this.grid[ref.position.row + dir.x][ref.position.col + dir.y].size(); i++) {
+                if (this.grid[ref.position.row + dir.x][ref.position.col + dir.y].get(i).block.equals(rock) ) {
+                    isPush = push(this.grid[ref.position.row + dir.x][ref.position.col + dir.y].get(i), dir);
+                }
+            }
+            if(isPush){
+                this.grid[ref.position.row][ref.position.col].remove(ref);
+                ref.position.row += dir.x;
+                ref.position.col += dir.y;
+                this.grid[ref.position.row][ref.position.col].add(ref);
+
+                ImageView img = ref.getImageView();
+                img.setTranslateX(img.getTranslateX() + (dir.x * 40));
+                img.setTranslateY(img.getTranslateY() + (dir.y * 40));
+
+            }
+            return isPush;
+    }
+
+    public void Move(Direction dir) {
+        ArrayList<Rule> rules = this.getRules();
+        Words baba = null;
+
+        for (Rule args : rules) {
+            if (args.third.equals(Words.you)) {
+                baba = Words.valueOf(args.first.getName().toLowerCase());
+            }
+        }
+        ArrayList<Entities> test = new ArrayList<Entities>();
+        for (int i=0;i<this.grid.length;i++) {
+            for (int j = 0; j < this.grid[i].length; j++) {
+                if (!this.grid[i][j].isEmpty()) {
+                    for (Entities args : this.grid[i][j]) {
+                        if (args.block.equals(baba)) {
+                            test.add(args);
+                        }
+                    }
+                }
+            }
+        }
+        for (Entities args:test){
+            push(args, dir);
+        }
+    }
 }
 
 
 
-    /*public void deplacerUp(Object obj){
-        for(int i=0;i<this.grid.length;i++){
-            for(int j=0;j<this.grid[0].length;j++){
-                for(Entities args:this.grid[i][j]){
-                    if(args.block == obj){
-                        args.position.row --;
-                        this.grid[i-1][j].add(args);
-                        this.grid[i][j].remove(args);
-                    }
-                }
-            }
-        }
-    }
 
-    public void deplacerDown(Object obj){
-        for(int i=0;i<this.grid.length;i++){
-            for(int j=0;j<this.grid[0].length;j++){
-                for(Entities args:this.grid[i][j]){
-                    if(args.block == obj){
-                        args.position.row ++;
-                        this.grid[i+1][j].add(args);
-                        this.grid[i][j].remove(args);
-                    }
-                }
-            }
-        }
-    }
 
-    public void deplacerRight(Object obj){
-        for(int i=0;i<this.grid.length;i++){
-            for(int j=0;j<this.grid[0].length;j++){
-                for(Entities args:this.grid[i][j]){
-                    if(args.block == obj){//equals
-                        args.position.col ++;
-                        this.grid[i][j+1].add(args);
-                        this.grid[i][j].remove(args);
-                    }
-                }
-            }
-        }
-    }
 
-    public void deplacerLeft(Object obj){
-        for(int i=0;i<this.grid.length;i++){
-            for(int j=0;j<this.grid[0].length;j++){
-                for(Entities args:this.grid[i][j]){
-                    if(args.block == obj){
-                        args.position.row --;
-                        this.grid[i--][j].add(args);
-                        this.grid[i][j].remove(args);
-                    }
-                }
-            }
-        }
-    }*/
 
 
 
@@ -308,77 +362,6 @@ public class Grid {
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-   /* public ArrayList<Rule> therule(){
-        ArrayList<Rule> obj = new ArrayList<Rule>();
-        ArrayList<Rule> rule = new ArrayList<>();
-        Rule tmp;
-        for(int i=0;i<this.grid.length;i++){// de la gauche vers la droite
-            for(int j=0;j<this.grid[0].length-3;j++){
-                if (this.grid[i][j] != null){
-                    if(isMateriel(this.grid[i][j].get(0).block) && isConnected(this.grid[i][j+1].get(0).block)&& isproperty(this.grid[i][j+2].get(0).block)){
-                        tmp = new Rule(this.grid[i][j].get(0).block,this.grid[i][j+1].get(0).block,this.grid[i][j+2].get(0).block);
-                        rule.add(tmp);
-                    }
-                }
-            }
-        }
-        for(int i=0;i<this.grid.length-3;i++){// haut vers le bas
-            for(int j=0;j<this.grid[0].length;j++){
-                if (this.grid[i][j] != null){
-                    if(isMateriel(this.grid[i][j].get(0).block) && isConnected(this.grid[i+1][j].get(0).block)&& isproperty(this.grid[i+2][j].get(0).block)){
-                        tmp = new Rule(this.grid[i][j].get(0).block,this.grid[i+1][j].get(0).block,this.grid[i+2][j].get(0).block);
-                        rule.add(tmp);
-                    }
-                }
-            }
-        }
-        for(int i=0;i<this.grid.length-3;i++){// haut vers le bas
-            for(int j=0;j<this.grid[0].length;j++){
-                if (this.grid[i][j] != null){
-                    if(isMateriel(this.grid[i][j].get(0).block) && isConnected(this.grid[i+1][j].get(0).block)&& isMateriel(this.grid[i+2][j].get(0).block)){
-                        tmp = new Rule(this.grid[i][j].get(0).block,this.grid[i+1][j].get(0).block,this.grid[i+2][j].get(0).block);
-                        rule.add(tmp);
-                    }
-                }
-            }
-        }
-        for(int i=0;i<this.grid.length-3;i++){// haut vers le bas
-            for(int j=0;j<this.grid[0].length;j++){
-                if (this.grid[i][j] != null){
-                    if(isMateriel(this.grid[i][j].get(0).block) && isConnected(this.grid[i][j+1].get(0).block)&& isMateriel(this.grid[i][j+2].get(0).block)){
-                        tmp = new Rule(this.grid[i][j].get(0).block,this.grid[i][j+1].get(0).block,this.grid[i][j+2].get(0).block);
-                        rule.add(tmp);
-                    }
-                }
-            }
-        }
-        return rule;
-    }
-
-    // create a fonction that given Objet who doing action ...
-}
-*/
 
 
 
