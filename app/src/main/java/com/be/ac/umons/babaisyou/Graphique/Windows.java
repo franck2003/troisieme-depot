@@ -37,42 +37,18 @@ import javax.sound.sampled.*;
 public class Windows extends Application implements EventHandler<KeyEvent> {
 
     GameMenu gameMenu;
+    Stage stage;
+
 
     private Grid grille;
     public void start(Stage stage) {
+        this.stage = stage;
         try {
 
-            Group root = new Group();//ensemble dans lequel on va stoker nos composants
-            Scene scene = new Scene(root, 600,600, Color.BLACK);
-            grille = new Grid("map1.txt");
-            Image image ;
-            ImageView imageView;
-            ArrayList<Entities>[][] ref = grille.getGrid();
-            for(int i=0; i< ref.length;i++){
-                for(int j=0; j< ref[0].length;j++){
-                        for(Entities args:ref[i][j]) {
-                            image = new Image(new FileInputStream(args.block.getPath()));
-                            imageView = new ImageView(image);
-                            root.getChildren().add(imageView);
-                            args.setImageView(imageView);
-                            imageView.setTranslateX(args.position.row * 40);
-                            imageView.setTranslateY(args.position.col * 40);
-                        }
-                }
-            }
-            Windows.PlayMusic("D:\\projet_baba_is_you_new\\app\\src\\main\\resources\\Image\\song.wav");
+            Interface("map1.txt");
+            /*
 
-            root.setTranslateX(100);
-            root.setTranslateY(100);
-            //stage.setIconified(true);
-            stage.getIcons().add(new Image("file:src\\main\\resources\\Image\\icon.png"));
-            stage.setTitle("BabaIsYou!");
-            stage.setScene(scene);
-            scene.setOnKeyPressed(this);
-            stage.setResizable(false);// permet d'empecher l'agrandissement ou le raccourciument
-            stage.show();//permet d'afficher la fenetre
-
-/*            Pane root = new Pane();
+            Pane root = new Pane();
             root.setPrefSize(600,600);
             
             gameMenu = new GameMenu();
@@ -88,6 +64,7 @@ public class Windows extends Application implements EventHandler<KeyEvent> {
             //root.setStyle("D:\\projet_baba_is_you_new\\app\\src\\main\\resources\\Image\\image.png");
             stage.setScene(scene);
             stage.show();
+
 */
         } catch (Exception e) {
             e.printStackTrace();
@@ -100,15 +77,49 @@ public class Windows extends Application implements EventHandler<KeyEvent> {
 
     }
 
+    public void Interface(String map) throws IOException {
+        Group root = new Group();
+        Scene scene = new Scene(root, 900, 800, Color.BLACK);
+        grille = new Grid(map);
+        Image image;
+        ImageView imageView;
+        ArrayList<Entities>[][] ref = grille.getGrid();
+        for (int i = 0; i < ref.length; i++) {
+            for (int j = 0; j < ref[0].length; j++) {
+                for (Entities args : ref[i][j]) {
+                    image = new Image(new FileInputStream(args.block.getPath()));
+                    imageView = new ImageView(image);
+                    root.getChildren().add(imageView);
+                    args.setImageView(imageView);
+                    imageView.setTranslateX(args.position.row * 40);
+                    imageView.setTranslateY(args.position.col * 40);
+                }
+            }
+        }
+        Windows.PlayMusic("D:\\projet_baba_is_you_new\\app\\src\\main\\resources\\Image\\song.wav");
+        root.setTranslateX(100);
+        root.setTranslateY(90);
+        //stage.setIconified(true);
+        stage.getIcons().add(new Image("file:src\\main\\resources\\Image\\baba.png"));
+        stage.setTitle("BabaIsYou!");
+        stage.setScene(scene);
+        scene.setOnKeyPressed(this);
+        stage.setResizable(false);// permet d'empecher l'agrandissement ou le raccourciument
+        stage.show();//permet d'afficher la fenetre}
+    }
     @Override
     public void handle(KeyEvent event) {
-        System.out.println(111);
-        switch (event.getCode()){
-            case RIGHT -> grille.Move(Direction.RIGHT);
-            case LEFT-> grille.Move(Direction.LEFT);
-            case UP -> grille.Move(Direction.UP);
-            case DOWN -> grille.Move(Direction.DOWN);
-            default -> System.out.println("NOP");
+        try {
+            switch (event.getCode()) {
+                case RIGHT -> grille.Move(Direction.RIGHT);
+                case LEFT -> grille.Move(Direction.LEFT);
+                case UP -> grille.Move(Direction.UP);
+                case DOWN -> grille.Move(Direction.DOWN);
+                case Q -> this.Interface("map1.txt");
+                default -> System.out.print("");
+            }
+        } catch (IOException e) {
+
         }
     }
 

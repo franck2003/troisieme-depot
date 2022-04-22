@@ -9,6 +9,7 @@ public enum Words {
         text_rock(TypeOfWords.NOUN,"src\\main\\resources\\Image\\test_rock.png","rock"),
         text_wall(TypeOfWords.NOUN,"src\\main\\resources\\Image\\test_wall.png","wall"),
         text_flag(TypeOfWords.NOUN,"src\\main\\resources\\Image\\test_flag.png","flag"),
+        push(TypeOfWords.PROPERTY,"src\\main\\resources\\Image\\push.png","push"),
 
         // OPERATORS
         is(TypeOfWords.OPERATOR,"src\\main\\resources\\Image\\is.png",""),
@@ -22,8 +23,7 @@ public enum Words {
         win(TypeOfWords.PROPERTY,"src\\main\\resources\\Image\\win.png","win"),
         stop(TypeOfWords.PROPERTY,"src\\main\\resources\\Image\\stop.png","stop"),
         flag(TypeOfWords.PROPERTY,"src\\main\\resources\\Image\\flag.png","flag"),
-        wall(TypeOfWords.PROPERTY,"src\\main\\resources\\Image\\wall.png","wall"),
-        push(TypeOfWords.PROPERTY,"src\\main\\resources\\Image\\push.png","push"),;
+        wall(TypeOfWords.PROPERTY,"src\\main\\resources\\Image\\wall.png","wall");
 
         private final TypeOfWords type;
         private final String path;

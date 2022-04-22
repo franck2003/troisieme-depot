@@ -47,10 +47,6 @@ public class Grid {
                 }
             }
         }
-        /*obj = therule();
-        for (Rule args:obj){
-            System.out.println(args.first+" "+args.second+" "+args.third);
-        }*/
     }
 
     public ArrayList<Entities>[][] getGrid(){
@@ -110,31 +106,30 @@ public class Grid {
         ArrayList<Rule> rules = new ArrayList<Rule>();
         List<Entities> list = getIs();
         for (Entities second : list) {
-            if (this.grid[second.position.row - 1][second.position.col].size() != 0 && this.grid[second.position.row + 1][second.position.col].size() != 0) {
-                for (Entities first : this.grid[second.position.row - 1][second.position.col]) {
-                    for (Entities third : this.grid[second.position.row + 1][second.position.col]) {
-                        if (Rule.isValid(first.block, second.block, third.block)) {
-                            rules.add(new Rule(first.block, second.block, third.block));
+            if(ingrid(second.position.row - 1, second.position.col) && ingrid(second.position.row+1,second.position.col)) {
+                if (this.grid[second.position.row - 1][second.position.col].size() != 0 && this.grid[second.position.row + 1][second.position.col].size() != 0) {
+                    for (Entities first : this.grid[second.position.row - 1][second.position.col]) {
+                        for (Entities third : this.grid[second.position.row + 1][second.position.col]) {
+                            if (Rule.isValid(first.block, second.block, third.block)) {
+                                rules.add(new Rule(first.block, second.block, third.block));
+                                //first.getImageView().setOpacity(0.5);
+                            }
                         }
                     }
                 }
             }
-            if (this.grid[second.position.row][second.position.col - 1].size() != 0 || this.grid[second.position.row][second.position.col + 1].size() != 0) {
-                for (Entities first : this.grid[second.position.row][second.position.col - 1]) {
-                    for (Entities third : this.grid[second.position.row][second.position.col + 1]) {
-                        if (Rule.isValid(first.block, second.block, third.block)) {
-                            rules.add(new Rule(first.block, second.block, third.block));
+            if(ingrid(second.position.row , second.position.col-1) && ingrid(second.position.row,second.position.col+1)) {
+                if (this.grid[second.position.row][second.position.col - 1].size() != 0 || this.grid[second.position.row][second.position.col + 1].size() != 0) {
+                    for (Entities first : this.grid[second.position.row][second.position.col - 1]) {
+                        for (Entities third : this.grid[second.position.row][second.position.col + 1]) {
+                            if (Rule.isValid(first.block, second.block, third.block)) {
+                                rules.add(new Rule(first.block, second.block, third.block));
+                                //System.out.println("1");
+                            }
                         }
                     }
                 }
             }
-            /*for(Rule args:rules){
-                System.out.print(args.first+" ");
-                System.out.print(args.second+" ");
-                System.out.print(args.third+" ");
-                System.out.println();
-            }*/
-
         }
         return rules;
     }
@@ -160,10 +155,21 @@ public class Grid {
         return false;
     }
 
+    public boolean IsPushable(Words ref){
+        ArrayList<Words> n= new ArrayList<Words>();
+        ArrayList<Rule> ref2 = getRules();
+        n.add(Words.push);
+        n.add(Words.win);
+        n.add(Words.stop);
+        n.add(Words.you);
+        return n.contains(ref) || ref.isType(TypeOfWords.NOUN) || ref.isType(TypeOfWords.OPERATOR);
+    }
+
     public boolean push(Entities ref, Direction dir) {
         ArrayList<Rule> rules = this.getRules();
         Words wall = null;
         Words rock = null;
+        Words flag = null;
         boolean isPush = true;
         for (Rule args : rules) {
             if (args.third.equals(Words.stop)) {
@@ -173,31 +179,31 @@ public class Grid {
                 rock = Words.valueOf(args.first.getName().toLowerCase());
             }
         }
-            if (!ingrid(ref.position.row + dir.x, ref.position.col + dir.y)) {
+        if (!ingrid(ref.position.row + dir.x, ref.position.col + dir.y)) {
+            return false;
+        }
+        for (Entities args : this.grid[ref.position.row + dir.x][ref.position.col + dir.y]) {
+            if (args.block.equals(wall)) {
                 return false;
             }
-            for (Entities args : this.grid[ref.position.row + dir.x][ref.position.col + dir.y]) {
-                if (args.block.equals(wall)) {
-                    return false;
-                }
+        }
+        for (int i = 0; i < this.grid[ref.position.row + dir.x][ref.position.col + dir.y].size(); i++) {
+            if (this.grid[ref.position.row + dir.x][ref.position.col + dir.y].get(i).block.equals(rock) || IsPushable(this.grid[ref.position.row + dir.x][ref.position.col + dir.y].get(i).block)) {
+                isPush = push(this.grid[ref.position.row + dir.x][ref.position.col + dir.y].get(i), dir);
             }
-            for (int i = 0; i < this.grid[ref.position.row + dir.x][ref.position.col + dir.y].size(); i++) {
-                if (this.grid[ref.position.row + dir.x][ref.position.col + dir.y].get(i).block.equals(rock) ) {
-                    isPush = push(this.grid[ref.position.row + dir.x][ref.position.col + dir.y].get(i), dir);
-                }
-            }
-            if(isPush){
-                this.grid[ref.position.row][ref.position.col].remove(ref);
-                ref.position.row += dir.x;
-                ref.position.col += dir.y;
-                this.grid[ref.position.row][ref.position.col].add(ref);
+        }
+        if(isPush){
+            this.grid[ref.position.row][ref.position.col].remove(ref);
+            ref.position.row += dir.x;
+            ref.position.col += dir.y;
+            this.grid[ref.position.row][ref.position.col].add(ref);
 
-                ImageView img = ref.getImageView();
-                img.setTranslateX(img.getTranslateX() + (dir.x * 40));
-                img.setTranslateY(img.getTranslateY() + (dir.y * 40));
+            ImageView img = ref.getImageView();
+            img.setTranslateX(img.getTranslateX() + (dir.x * 40));
+            img.setTranslateY(img.getTranslateY() + (dir.y * 40));
 
-            }
-            return isPush;
+        }
+        return isPush;
     }
 
     public void Move(Direction dir) {
