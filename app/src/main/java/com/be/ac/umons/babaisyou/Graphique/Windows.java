@@ -38,17 +38,15 @@ public class Windows extends Application implements EventHandler<KeyEvent> {
 
     GameMenu gameMenu;
     Stage stage;
+    private static int i = 1;
 
 
     private Grid grille;
     public void start(Stage stage) {
         this.stage = stage;
         try {
-
             Interface("map1.txt");
-            /*
-
-            Pane root = new Pane();
+            /*Pane root = new Pane();
             root.setPrefSize(600,600);
             
             gameMenu = new GameMenu();
@@ -65,7 +63,8 @@ public class Windows extends Application implements EventHandler<KeyEvent> {
             stage.setScene(scene);
             stage.show();
 
-*/
+             */
+
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -111,17 +110,48 @@ public class Windows extends Application implements EventHandler<KeyEvent> {
     public void handle(KeyEvent event) {
         try {
             switch (event.getCode()) {
+                case RIGHT :
+                    grille.Move(Direction.RIGHT);
+                    break;
+                case LEFT :
+                    grille.Move(Direction.LEFT);
+                    break;
+                case UP :
+                    grille.Move(Direction.UP);
+                    break;
+                case DOWN :
+                    grille.Move(Direction.DOWN);
+                    break;
+                case Q :
+                    i++;
+                    this.Interface("map"+String.valueOf(i)+".txt");
+                    break;
+                case S :
+                    i--;
+                    this.Interface("map"+String.valueOf(i)+".txt");
+                    break;    
+                default : System.out.print("");
+            }
+        } catch (IOException e) {
+
+        }
+    }
+    /*
+    public void handle(KeyEvent event) {
+        try {
+            switch (event.getCode()) {
                 case RIGHT -> grille.Move(Direction.RIGHT);
                 case LEFT -> grille.Move(Direction.LEFT);
                 case UP -> grille.Move(Direction.UP);
                 case DOWN -> grille.Move(Direction.DOWN);
-                case Q -> this.Interface("map1.txt");
+                case Q -> this.Interface("map"+String.valueOf(i)+".txt");
                 default -> System.out.print("");
             }
         } catch (IOException e) {
 
         }
     }
+     */
 
     public static class GameMenu extends Parent{
         GameMenu(){
@@ -139,7 +169,11 @@ public class Windows extends Application implements EventHandler<KeyEvent> {
             Button initRule = new Button("INIT RULES");
 
             play.setOnMouseClicked(event -> {
-                System.out.println("PLAY");
+                /*try {
+                    //new Interface("map1.txt");
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }*/
             });
 
 
