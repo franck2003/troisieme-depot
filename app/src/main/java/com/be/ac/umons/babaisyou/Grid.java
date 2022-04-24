@@ -167,9 +167,12 @@ public class Grid {
 
     public boolean push(Entities ref, Direction dir) {
         ArrayList<Rule> rules = this.getRules();
+        ArrayList<Entities> entities = new ArrayList<>();
         Words wall = null;
         Words rock = null;
         Words flag = null;
+        Words hot = null;
+        Words baba = null;
         boolean isPush = true;
         for (Rule args : rules) {
             if (args.third.equals(Words.stop)) {
@@ -178,9 +181,37 @@ public class Grid {
             if (args.third.equals(Words.push)) {
                 rock = Words.valueOf(args.first.getName().toLowerCase());
             }
+            if (args.third.equals(Words.you)) {
+                baba = Words.valueOf(args.first.getName().toLowerCase());
+            }
+            if(args.third.equals(Words.sink)){
+                hot = Words.valueOf(args.first.getName().toLowerCase());
+                //System.out.println("p");
+            }
         }
         if (!ingrid(ref.position.row + dir.x, ref.position.col + dir.y)) {
             return false;
+        }
+        for (Entities args : this.grid[ref.position.row + dir.x][ref.position.col + dir.y]) {
+            if(args.block.equals(hot) && ref.block.equals(baba)){
+                entities.add(ref);
+                entities.add(args);
+            }
+            if ((args.block.equals(hot) && ref.block.equals(rock))) {
+                entities.add(ref);
+                entities.add(args);
+            }else if((args.block.equals(hot) && IsPushable(ref.block))){
+                return true;
+            }
+        }
+        if(entities.size()!=0) {
+            for (Entities charac : entities) {
+                ImageView img = charac.getImageView();
+                img.setTranslateX(img.getTranslateX() + (dir.x * 1000));
+                img.setTranslateY(img.getTranslateY() + (dir.y * 1000));
+                this.grid[ref.position.row + dir.x][ref.position.col + dir.y].remove(charac);
+            }
+            return true;
         }
         for (Entities args : this.grid[ref.position.row + dir.x][ref.position.col + dir.y]) {
             if (args.block.equals(wall)) {
@@ -216,10 +247,10 @@ public class Grid {
             }
         }
         ArrayList<Entities> test = new ArrayList<Entities>();
-        for (int i=0;i<this.grid.length;i++) {
-            for (int j = 0; j < this.grid[i].length; j++) {
-                if (!this.grid[i][j].isEmpty()) {
-                    for (Entities args : this.grid[i][j]) {
+        for (ArrayList<Entities>[] arrayLists : this.grid) {
+            for (ArrayList<Entities> arrayList : arrayLists) {
+                if (!arrayList.isEmpty()) {
+                    for (Entities args : arrayList) {
                         if (args.block.equals(baba)) {
                             test.add(args);
                         }

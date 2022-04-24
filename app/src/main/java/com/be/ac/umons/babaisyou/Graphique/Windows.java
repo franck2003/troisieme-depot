@@ -26,10 +26,7 @@ import javax.sound.sampled.AudioInputStream;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.KeyListener;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.Locale;
 import javax.sound.sampled.*;
@@ -42,11 +39,12 @@ public class Windows extends Application implements EventHandler<KeyEvent> {
 
 
     private Grid grille;
+
     public void start(Stage stage) {
         this.stage = stage;
         try {
-            Interface("map1.txt");
-            /*Pane root = new Pane();
+            //Interface("map1.txt");
+            Pane root = new Pane();
             root.setPrefSize(600,600);
             
             gameMenu = new GameMenu();
@@ -56,46 +54,66 @@ public class Windows extends Application implements EventHandler<KeyEvent> {
             BackgroundImage ima = new BackgroundImage(i,BackgroundRepeat.NO_REPEAT,BackgroundRepeat.NO_REPEAT,BackgroundPosition.DEFAULT,BackgroundSize.DEFAULT);
             Background imag = new Background(ima);
             root.setBackground(imag);
-            Windows.PlayMusic("D:\\projet_baba_is_you_new\\app\\src\\main\\resources\\Image\\song.wav");
+            //Windows.PlayMusic("D:\\projet_baba_is_you_new\\app\\src\\main\\resources\\Image\\song.wav");
             //Windows.PlayMusic("D:\\projet_baba_is_you_new\\app\\src\\main\\resources\\Image\\hello.wav");
             Scene scene = new Scene(root, 600,600);
             //root.setStyle("D:\\projet_baba_is_you_new\\app\\src\\main\\resources\\Image\\image.png");
             stage.setScene(scene);
             stage.show();
+            
 
-             */
-
+            Windows.PlayMusicLoop("D:\\projet_baba_is_you_new\\app\\src\\main\\resources\\Image\\song.wav");
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    public static void main (String[]args){
+    public static void main(String[] args) {
 
         launch(args);
 
     }
 
-    public void Interface(String map) throws IOException {
+    public void Interface(String map) throws FileNotFoundException {
         Group root = new Group();
         Scene scene = new Scene(root, 900, 800, Color.BLACK);
-        grille = new Grid(map);
+        try {
+            grille = new Grid(map);
+        } catch (IOException e) {
+            System.out.println(e.getMessage());
+        }
         Image image;
         ImageView imageView;
         ArrayList<Entities>[][] ref = grille.getGrid();
+        /*for(int i = 0; i < ref.length; i++) {
+            for (int j = 0; j < ref[0].length; j++) {
+                if(i==0 || j==ref[0].length-1 ||  j==0 || i==ref.length-1){
+                    image = new Image(new FileInputStream("D:\\projet_baba_is_you_new\\app\\src\\main\\resources\\Image\\border.png"));
+                    imageView = new ImageView(image);
+                    root.getChildren().add(imageView);
+                    imageView.setTranslateX(i * 40);
+                    imageView.setTranslateY(j * 40);
+                }
+            }
+        }*/
+
         for (int i = 0; i < ref.length; i++) {
             for (int j = 0; j < ref[0].length; j++) {
                 for (Entities args : ref[i][j]) {
-                    image = new Image(new FileInputStream(args.block.getPath()));
-                    imageView = new ImageView(image);
-                    root.getChildren().add(imageView);
-                    args.setImageView(imageView);
-                    imageView.setTranslateX(args.position.row * 40);
-                    imageView.setTranslateY(args.position.col * 40);
+                    try {
+                        image = new Image(new FileInputStream(args.block.getPath()));
+                        imageView = new ImageView(image);
+                        root.getChildren().add(imageView);
+                        args.setImageView(imageView);
+                        imageView.setTranslateX(args.position.row * 40);
+                        imageView.setTranslateY(args.position.col * 40);
+                    } catch (IOException e) {
+                        System.out.println(e.getMessage());
+                    }
                 }
             }
         }
-        Windows.PlayMusic("D:\\projet_baba_is_you_new\\app\\src\\main\\resources\\Image\\song.wav");
+
         root.setTranslateX(100);
         root.setTranslateY(90);
         //stage.setIconified(true);
@@ -106,34 +124,54 @@ public class Windows extends Application implements EventHandler<KeyEvent> {
         stage.setResizable(false);// permet d'empecher l'agrandissement ou le raccourciument
         stage.show();//permet d'afficher la fenetre}
     }
+
     @Override
     public void handle(KeyEvent event) {
-        try {
-            switch (event.getCode()) {
-                case RIGHT :
-                    grille.Move(Direction.RIGHT);
-                    break;
-                case LEFT :
-                    grille.Move(Direction.LEFT);
-                    break;
-                case UP :
-                    grille.Move(Direction.UP);
-                    break;
-                case DOWN :
-                    grille.Move(Direction.DOWN);
-                    break;
-                case Q :
-                    i++;
-                    this.Interface("map"+String.valueOf(i)+".txt");
-                    break;
-                case S :
-                    i--;
-                    this.Interface("map"+String.valueOf(i)+".txt");
-                    break;    
-                default : System.out.print("");
+        switch (event.getCode()) {
+            case RIGHT -> {
+                grille.Move(Direction.RIGHT);
+                Windows.PlayMusic("src\\main\\resources\\Image\\saut.wav");
             }
-        } catch (IOException e) {
-
+            case LEFT -> {
+                grille.Move(Direction.LEFT);
+                Windows.PlayMusic("src\\main\\resources\\Image\\saut.wav");
+            }
+            case UP -> {
+                grille.Move(Direction.UP);
+                Windows.PlayMusic("src\\main\\resources\\Image\\saut.wav");
+            }
+            case DOWN -> {
+                grille.Move(Direction.DOWN);
+                Windows.PlayMusic("src\\main\\resources\\Image\\saut.wav");
+            }
+            case P -> {
+                //System.out.println(i);
+                //System.out.println("map"+String.valueOf(i)+".txt");
+                i++;
+                try {
+                    this.Interface("map" + String.valueOf(i) + ".txt");
+                } catch (FileNotFoundException e) {
+                    e.printStackTrace();
+                }
+            }
+            case O -> {
+                //System.out.println(i);
+                //System.out.println("map"+String.valueOf(i)+".txt");
+                try {
+                    this.Interface("map" + String.valueOf(i) + ".txt");
+                } catch (FileNotFoundException e) {
+                    e.printStackTrace();
+                }
+            }
+            case S -> {
+                i--;
+                try {
+                    this.Interface("map" + String.valueOf(i) + ".txt");
+                } catch (FileNotFoundException e) {
+                    e.printStackTrace();
+                }
+            }
+            default -> System.out.print("");
         }
     }
     /*
@@ -169,8 +207,9 @@ public class Windows extends Application implements EventHandler<KeyEvent> {
             Button initRule = new Button("INIT RULES");
 
             play.setOnMouseClicked(event -> {
+                System.out.println("play");
                 /*try {
-                    //new Interface("map1.txt");
+                    Interface("map1.txt");
                 } catch (IOException e) {
                     e.printStackTrace();
                 }*/
@@ -180,6 +219,7 @@ public class Windows extends Application implements EventHandler<KeyEvent> {
             setting.setOnMouseClicked(event -> {
                 System.out.println("SETTING");
             });
+
 
             quit.setOnMouseClicked(event -> {
                 System.out.println("QUIT");
@@ -201,6 +241,8 @@ public class Windows extends Application implements EventHandler<KeyEvent> {
     }
 
     public static class Button extends StackPane{
+
+
         Button(String name){
             Text text = new Text(name);
             text.setFont(Font.font(20));
@@ -224,7 +266,7 @@ public class Windows extends Application implements EventHandler<KeyEvent> {
         }
     }
 
-    public static void PlayMusic(String path){
+    public static void PlayMusicLoop(String path){
 
         try{
 
@@ -237,6 +279,23 @@ public class Windows extends Application implements EventHandler<KeyEvent> {
             clip.start();
         }catch (Exception e)
         {
+            System.out.println(e.getMessage());
+        }
+    }
+
+    public static void PlayMusic(String path){
+
+        try{
+
+            File file = new File(path);
+            AudioInputStream audioInputStream = AudioSystem.getAudioInputStream(file);
+            Clip clip = AudioSystem.getClip();
+            clip.open(audioInputStream);
+
+            clip.start();
+        }catch (Exception e)
+        {
+            System.out.println(e.getMessage());
         }
     }
 }

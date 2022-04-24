@@ -9,6 +9,8 @@ public enum Words {
         text_rock(TypeOfWords.NOUN,"src\\main\\resources\\Image\\test_rock.png","rock"),
         text_wall(TypeOfWords.NOUN,"src\\main\\resources\\Image\\test_wall.png","wall"),
         text_flag(TypeOfWords.NOUN,"src\\main\\resources\\Image\\test_flag.png","flag"),
+        hot(TypeOfWords.NOUN,"src\\main\\resources\\Image\\hot.png","water"),
+
         push(TypeOfWords.PROPERTY,"src\\main\\resources\\Image\\push.png","push"),
 
         // OPERATORS
@@ -23,6 +25,7 @@ public enum Words {
         win(TypeOfWords.PROPERTY,"src\\main\\resources\\Image\\win.png","win"),
         stop(TypeOfWords.PROPERTY,"src\\main\\resources\\Image\\stop.png","stop"),
         flag(TypeOfWords.PROPERTY,"src\\main\\resources\\Image\\flag.png","flag"),
+        sink(TypeOfWords.PROPERTY,"src\\main\\resources\\Image\\sink.png","water"),
         wall(TypeOfWords.PROPERTY,"src\\main\\resources\\Image\\wall.png","wall");
 
         private final TypeOfWords type;
