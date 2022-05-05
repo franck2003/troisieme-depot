@@ -1,10 +1,8 @@
 package com.be.ac.umons.babaisyou;
 
-import com.be.ac.umons.babaisyou.rules.Rule;
+//import com.be.ac.umons.babaisyou.myRules.Rule;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.ArrayList;
 
 public class App {
     public String getGreeting() {

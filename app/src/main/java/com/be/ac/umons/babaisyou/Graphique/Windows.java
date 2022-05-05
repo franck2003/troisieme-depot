@@ -35,10 +35,16 @@ public class Windows extends Application implements EventHandler<KeyEvent> {
 
     GameMenu gameMenu;
     Stage stage;
+    Group root;
     private static int i = 1;
+    private static int j = i+1;
 
 
     private Grid grille;
+
+    public static void setI() {
+         i++;
+    }
 
     public void start(Stage stage) {
         this.stage = stage;
@@ -46,7 +52,7 @@ public class Windows extends Application implements EventHandler<KeyEvent> {
             //Interface("map1.txt");
             Pane root = new Pane();
             root.setPrefSize(600,600);
-            
+
             gameMenu = new GameMenu();
 
             root.getChildren().add(gameMenu);
@@ -60,7 +66,7 @@ public class Windows extends Application implements EventHandler<KeyEvent> {
             //root.setStyle("D:\\projet_baba_is_you_new\\app\\src\\main\\resources\\Image\\image.png");
             stage.setScene(scene);
             stage.show();
-            
+
 
             Windows.PlayMusicLoop("D:\\projet_baba_is_you_new\\app\\src\\main\\resources\\Image\\song.wav");
         } catch (Exception e) {
@@ -75,7 +81,7 @@ public class Windows extends Application implements EventHandler<KeyEvent> {
     }
 
     public void Interface(String map) throws FileNotFoundException {
-        Group root = new Group();
+        root = new Group();
         Scene scene = new Scene(root, 900, 800, Color.BLACK);
         try {
             grille = new Grid(map);
@@ -85,24 +91,17 @@ public class Windows extends Application implements EventHandler<KeyEvent> {
         Image image;
         ImageView imageView;
         ArrayList<Entities>[][] ref = grille.getGrid();
-        /*for(int i = 0; i < ref.length; i++) {
-            for (int j = 0; j < ref[0].length; j++) {
-                if(i==0 || j==ref[0].length-1 ||  j==0 || i==ref.length-1){
-                    image = new Image(new FileInputStream("D:\\projet_baba_is_you_new\\app\\src\\main\\resources\\Image\\border.png"));
-                    imageView = new ImageView(image);
-                    root.getChildren().add(imageView);
-                    imageView.setTranslateX(i * 40);
-                    imageView.setTranslateY(j * 40);
-                }
-            }
-        }*/
 
         for (int i = 0; i < ref.length; i++) {
             for (int j = 0; j < ref[0].length; j++) {
                 for (Entities args : ref[i][j]) {
                     try {
+
                         image = new Image(new FileInputStream(args.block.getPath()));
                         imageView = new ImageView(image);
+                        if(args.block.toString().equals("wall")){
+                            imageView.setOpacity(0.4);
+                        }
                         root.getChildren().add(imageView);
                         args.setImageView(imageView);
                         imageView.setTranslateX(args.position.row * 40);
@@ -129,19 +128,35 @@ public class Windows extends Application implements EventHandler<KeyEvent> {
     public void handle(KeyEvent event) {
         switch (event.getCode()) {
             case RIGHT -> {
-                grille.Move(Direction.RIGHT);
+                try {
+                    grille.Move(Direction.RIGHT, root);
+                } catch (FileNotFoundException e) {
+                    e.printStackTrace();
+                }
                 Windows.PlayMusic("src\\main\\resources\\Image\\saut.wav");
             }
             case LEFT -> {
-                grille.Move(Direction.LEFT);
+                try {
+                    grille.Move(Direction.LEFT, root);
+                } catch (FileNotFoundException e) {
+                    e.printStackTrace();
+                }
                 Windows.PlayMusic("src\\main\\resources\\Image\\saut.wav");
             }
             case UP -> {
-                grille.Move(Direction.UP);
+                try {
+                    grille.Move(Direction.UP, root);
+                } catch (FileNotFoundException e) {
+                    e.printStackTrace();
+                }
                 Windows.PlayMusic("src\\main\\resources\\Image\\saut.wav");
             }
             case DOWN -> {
-                grille.Move(Direction.DOWN);
+                try {
+                    grille.Move(Direction.DOWN, root);
+                } catch (FileNotFoundException e) {
+                    e.printStackTrace();
+                }
                 Windows.PlayMusic("src\\main\\resources\\Image\\saut.wav");
             }
             case P -> {
@@ -173,6 +188,15 @@ public class Windows extends Application implements EventHandler<KeyEvent> {
             }
             default -> System.out.print("");
         }
+        if(i == j){
+            root = new Group();
+            j++;
+            try {
+                this.Interface("map" + String.valueOf(i) + ".txt");
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            }
+        }
     }
     /*
     public void handle(KeyEvent event) {
@@ -186,12 +210,11 @@ public class Windows extends Application implements EventHandler<KeyEvent> {
                 default -> System.out.print("");
             }
         } catch (IOException e) {
-
         }
     }
      */
 
-    public static class GameMenu extends Parent{
+    public class GameMenu extends Parent{
         GameMenu(){
             Pane root = new Pane();
             VBox menu = new VBox(5);
@@ -208,11 +231,11 @@ public class Windows extends Application implements EventHandler<KeyEvent> {
 
             play.setOnMouseClicked(event -> {
                 System.out.println("play");
-                /*try {
-                    Interface("map1.txt");
+                try {
+                    Interface("map"+i+".txt");
                 } catch (IOException e) {
                     e.printStackTrace();
-                }*/
+                }
             });
 
 

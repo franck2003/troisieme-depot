@@ -1,6 +1,6 @@
 package com.be.ac.umons.babaisyou;
 
-import com.be.ac.umons.babaisyou.rules.Rule;
+
 
 public enum Words {
 
@@ -26,7 +26,8 @@ public enum Words {
         stop(TypeOfWords.PROPERTY,"src\\main\\resources\\Image\\stop.png","stop"),
         flag(TypeOfWords.PROPERTY,"src\\main\\resources\\Image\\flag.png","flag"),
         sink(TypeOfWords.PROPERTY,"src\\main\\resources\\Image\\sink.png","water"),
-        wall(TypeOfWords.PROPERTY,"src\\main\\resources\\Image\\wall.png","wall");
+        wall(TypeOfWords.PROPERTY,"src\\main\\resources\\Image\\wall.png","wall"),
+        grass(TypeOfWords.PROPERTY,"src\\main\\resources\\Image\\grass.png","grass");
 
         private final TypeOfWords type;
         private final String path;

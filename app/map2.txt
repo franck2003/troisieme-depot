@@ -1,4 +1,22 @@
 18 18
+grass 1 1
+grass 8 1
+grass 5 2
+grass 16 2
+grass 3 4
+grass 6 4
+grass 15 4
+grass 16 4
+grass 2 5
+grass 15 5
+grass 2 6
+grass 16 9
+grass 17 11
+grass 1 13
+grass 2 13
+grass 2 15
+grass 15 16
+grass 16 16
 wall 7 3
 wall 8 3
 wall 9 3
