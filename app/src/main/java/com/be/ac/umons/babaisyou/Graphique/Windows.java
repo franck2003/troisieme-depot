@@ -6,6 +6,7 @@ import javafx.application.Application;
 import javafx.event.EventHandler;
 import javafx.geometry.Pos;
 import javafx.scene.Group;
+import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
@@ -51,18 +52,20 @@ public class Windows extends Application implements EventHandler<KeyEvent> {
         try {
             //Interface("map1.txt");
             Pane root = new Pane();
-            root.setPrefSize(600,600);
+            //root.setPrefSize(600,600);
 
             gameMenu = new GameMenu();
 
+
             root.getChildren().add(gameMenu);
-            Image i = new Image("file:src\\main\\resources\\Image\\image.png");
+            root.setCenterShape(false);
+            Image i = new Image("file:src\\main\\resources\\Image\\image1.png");
             BackgroundImage ima = new BackgroundImage(i,BackgroundRepeat.NO_REPEAT,BackgroundRepeat.NO_REPEAT,BackgroundPosition.DEFAULT,BackgroundSize.DEFAULT);
             Background imag = new Background(ima);
             root.setBackground(imag);
-            //Windows.PlayMusic("D:\\projet_baba_is_you_new\\app\\src\\main\\resources\\Image\\song.wav");
-            //Windows.PlayMusic("D:\\projet_baba_is_you_new\\app\\src\\main\\resources\\Image\\hello.wav");
-            Scene scene = new Scene(root, 600,600);
+
+            Scene scene = new Scene(root, 900,800);
+
             //root.setStyle("D:\\projet_baba_is_you_new\\app\\src\\main\\resources\\Image\\image.png");
             stage.setScene(scene);
             stage.show();
@@ -163,6 +166,7 @@ public class Windows extends Application implements EventHandler<KeyEvent> {
                 //System.out.println(i);
                 //System.out.println("map"+String.valueOf(i)+".txt");
                 i++;
+                j++;
                 try {
                     this.Interface("map" + String.valueOf(i) + ".txt");
                 } catch (FileNotFoundException e) {
@@ -180,6 +184,7 @@ public class Windows extends Application implements EventHandler<KeyEvent> {
             }
             case S -> {
                 i--;
+                j--;
                 try {
                     this.Interface("map" + String.valueOf(i) + ".txt");
                 } catch (FileNotFoundException e) {
@@ -188,6 +193,7 @@ public class Windows extends Application implements EventHandler<KeyEvent> {
             }
             default -> System.out.print("");
         }
+        grille.appliRules(root);
         if(i == j){
             root = new Group();
             j++;
@@ -216,9 +222,8 @@ public class Windows extends Application implements EventHandler<KeyEvent> {
 
     public class GameMenu extends Parent{
         GameMenu(){
-            Pane root = new Pane();
+            GridPane root = new GridPane();
             VBox menu = new VBox(5);
-            menu.setAlignment(Pos.CENTER);
 
             Rectangle rt = new Rectangle(300, 50);
             rt.setFill(Color.GREY);
@@ -252,13 +257,17 @@ public class Windows extends Application implements EventHandler<KeyEvent> {
                 System.out.println("INIT RULES");
             });
 
-            root.setTranslateX(150);
-            root.setTranslateY(150);
 
             menu.getChildren().addAll(play, setting, quit, initRule);
+
+            //menu.setTranslateX(200);
+            //menu.setTranslateY(200);
+
             root.getChildren().addAll(rt, menu);
 
             getChildren().addAll(root);
+
+            root.setAlignment(Pos.CENTER);
         }
 
     }
@@ -271,7 +280,7 @@ public class Windows extends Application implements EventHandler<KeyEvent> {
             text.setFont(Font.font(20));
             text.setFill(Color.RED);
 
-            Rectangle rt = new Rectangle(300, 50);
+            Rectangle rt = new Rectangle(500, 100);
             rt.setOpacity(0.2);
             rt.setFill(Color.BLACK);
 
