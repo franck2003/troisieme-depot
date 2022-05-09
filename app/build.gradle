@@ -29,12 +29,17 @@ javafx {
 
 dependencies {
 
+    // Use JUnit Jupiter API for testing.
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.5.2'
+
+    // Use JUnit Jupiter Engine for testing.
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.5.2'
 
 }
 
 application {
     // Define the main class for the application.
-    mainClass = 'com.be.ac.umons.babaisyou.Graphique.Windows'
+    mainClass = 'com.be.ac.umons.babaisyou.view.Windows'
 }
 
 test {

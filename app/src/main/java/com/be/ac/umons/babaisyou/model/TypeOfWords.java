@@ -1,4 +1,4 @@
-package com.be.ac.umons.babaisyou;
+package com.be.ac.umons.babaisyou.model;
 
 public enum TypeOfWords {
     NOUN,

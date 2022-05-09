@@ -1,9 +1,13 @@
-package com.be.ac.umons.babaisyou.Graphique;
+package com.be.ac.umons.babaisyou.view;
 
-import com.be.ac.umons.babaisyou.Direction;
-import com.be.ac.umons.babaisyou.Entities;
+import com.be.ac.umons.babaisyou.model.Direction;
+import com.be.ac.umons.babaisyou.model.Entities;
+import com.be.ac.umons.babaisyou.model.Direction;
+import com.be.ac.umons.babaisyou.model.Entities;
+import com.be.ac.umons.babaisyou.model.Grid;
 import javafx.application.Application;
 import javafx.event.EventHandler;
+import javafx.geometry.HPos;
 import javafx.geometry.Pos;
 import javafx.scene.Group;
 import javafx.scene.Node;
@@ -19,7 +23,7 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
-import com.be.ac.umons.babaisyou.Grid;
+import com.be.ac.umons.babaisyou.model.Grid;
 import javafx.scene.text.Text;
 
 import javax.sound.sampled.AudioFormat;
@@ -37,36 +41,34 @@ public class Windows extends Application implements EventHandler<KeyEvent> {
     GameMenu gameMenu;
     Stage stage;
     Group root;
+    Scene scene ;
+    Button save;
     private static int i = 1;
     private static int j = i+1;
 
 
     private Grid grille;
 
+    public Grid getGrille(){
+        return grille;
+    }
+
+
     public static void setI() {
          i++;
     }
+    public static int getI(){return i;}
 
     public void start(Stage stage) {
         this.stage = stage;
         try {
-            //Interface("map1.txt");
-            Pane root = new Pane();
+            root = new Group();
             //root.setPrefSize(600,600);
 
-            gameMenu = new GameMenu();
-
-
-            root.getChildren().add(gameMenu);
-            root.setCenterShape(false);
-            Image i = new Image("file:src\\main\\resources\\Image\\image1.png");
-            BackgroundImage ima = new BackgroundImage(i,BackgroundRepeat.NO_REPEAT,BackgroundRepeat.NO_REPEAT,BackgroundPosition.DEFAULT,BackgroundSize.DEFAULT);
-            Background imag = new Background(ima);
-            root.setBackground(imag);
-
-            Scene scene = new Scene(root, 900,800);
-
-            //root.setStyle("D:\\projet_baba_is_you_new\\app\\src\\main\\resources\\Image\\image.png");
+            scene = new Scene(root, 900,800);
+            gameMenu = new GameMenu(this);
+            stage.getIcons().add(new Image("file:src\\main\\resources\\Image\\baba.png"));
+            stage.setTitle("BabaIsYou!");
             stage.setScene(scene);
             stage.show();
 
@@ -86,6 +88,8 @@ public class Windows extends Application implements EventHandler<KeyEvent> {
     public void Interface(String map) throws FileNotFoundException {
         root = new Group();
         Scene scene = new Scene(root, 900, 800, Color.BLACK);
+        save = new Button("SAVE");
+        root.getChildren().add(save);
         try {
             grille = new Grid(map);
         } catch (IOException e) {
@@ -116,12 +120,14 @@ public class Windows extends Application implements EventHandler<KeyEvent> {
             }
         }
 
+
         root.setTranslateX(100);
         root.setTranslateY(90);
         //stage.setIconified(true);
-        stage.getIcons().add(new Image("file:src\\main\\resources\\Image\\baba.png"));
-        stage.setTitle("BabaIsYou!");
         stage.setScene(scene);
+        save.setOnMouseClicked(event -> {
+            grille.writeInFile(Windows.getI());
+        });
         scene.setOnKeyPressed(this);
         stage.setResizable(false);// permet d'empecher l'agrandissement ou le raccourciument
         stage.show();//permet d'afficher la fenetre}
@@ -168,7 +174,7 @@ public class Windows extends Application implements EventHandler<KeyEvent> {
                 i++;
                 j++;
                 try {
-                    this.Interface("map" + String.valueOf(i) + ".txt");
+                    this.Interface("src\\main\\resources\\map\\map" + String.valueOf(i) + ".txt");
                 } catch (FileNotFoundException e) {
                     e.printStackTrace();
                 }
@@ -177,7 +183,7 @@ public class Windows extends Application implements EventHandler<KeyEvent> {
                 //System.out.println(i);
                 //System.out.println("map"+String.valueOf(i)+".txt");
                 try {
-                    this.Interface("map" + String.valueOf(i) + ".txt");
+                    this.Interface("src\\main\\resources\\map\\map" + String.valueOf(i) + ".txt");
                 } catch (FileNotFoundException e) {
                     e.printStackTrace();
                 }
@@ -186,115 +192,28 @@ public class Windows extends Application implements EventHandler<KeyEvent> {
                 i--;
                 j--;
                 try {
-                    this.Interface("map" + String.valueOf(i) + ".txt");
+                    this.Interface("src\\main\\resources\\map\\map" + String.valueOf(i) + ".txt");
                 } catch (FileNotFoundException e) {
                     e.printStackTrace();
                 }
             }
+            case N -> {
+                System.out.println("N");
+                grille.writeInFile(i);
+            }
             default -> System.out.print("");
         }
+
         grille.appliRules(root);
+
         if(i == j){
             root = new Group();
             j++;
             try {
-                this.Interface("map" + String.valueOf(i) + ".txt");
+                this.Interface("src\\main\\resources\\map\\map" + String.valueOf(i) + ".txt");
             } catch (FileNotFoundException e) {
                 e.printStackTrace();
             }
-        }
-    }
-    /*
-    public void handle(KeyEvent event) {
-        try {
-            switch (event.getCode()) {
-                case RIGHT -> grille.Move(Direction.RIGHT);
-                case LEFT -> grille.Move(Direction.LEFT);
-                case UP -> grille.Move(Direction.UP);
-                case DOWN -> grille.Move(Direction.DOWN);
-                case Q -> this.Interface("map"+String.valueOf(i)+".txt");
-                default -> System.out.print("");
-            }
-        } catch (IOException e) {
-        }
-    }
-     */
-
-    public class GameMenu extends Parent{
-        GameMenu(){
-            GridPane root = new GridPane();
-            VBox menu = new VBox(5);
-
-            Rectangle rt = new Rectangle(300, 50);
-            rt.setFill(Color.GREY);
-            rt.setOpacity(0.2);
-
-            Button play = new Button("PLAY");
-            Button setting = new Button("SETTING");
-            Button quit = new Button("QUIT");
-            Button initRule = new Button("INIT RULES");
-
-            play.setOnMouseClicked(event -> {
-                System.out.println("play");
-                try {
-                    Interface("map"+i+".txt");
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            });
-
-
-            setting.setOnMouseClicked(event -> {
-                System.out.println("SETTING");
-            });
-
-
-            quit.setOnMouseClicked(event -> {
-                System.out.println("QUIT");
-            });
-
-            initRule.setOnMouseClicked(event -> {
-                System.out.println("INIT RULES");
-            });
-
-
-            menu.getChildren().addAll(play, setting, quit, initRule);
-
-            //menu.setTranslateX(200);
-            //menu.setTranslateY(200);
-
-            root.getChildren().addAll(rt, menu);
-
-            getChildren().addAll(root);
-
-            root.setAlignment(Pos.CENTER);
-        }
-
-    }
-
-    public static class Button extends StackPane{
-
-
-        Button(String name){
-            Text text = new Text(name);
-            text.setFont(Font.font(20));
-            text.setFill(Color.RED);
-
-            Rectangle rt = new Rectangle(500, 100);
-            rt.setOpacity(0.2);
-            rt.setFill(Color.BLACK);
-
-            getChildren().addAll(rt, text);
-
-            setOnMouseEntered(event -> {
-                rt.setFill(Color.CHOCOLATE);
-                text.setFill(Color.BLACK);
-            });
-
-            setOnMouseExited(event -> {
-                rt.setFill(Color.BLACK);
-                text.setFill(Color.RED);
-            });
         }
     }
 

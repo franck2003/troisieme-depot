@@ -1,4 +1,4 @@
-package com.be.ac.umons.babaisyou.Graphique;
+package com.be.ac.umons.babaisyou.view;
 
 public enum Size {
 

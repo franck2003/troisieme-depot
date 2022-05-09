@@ -1,4 +1,4 @@
-package com.be.ac.umons.babaisyou;
+package com.be.ac.umons.babaisyou.model;
 
 
 
@@ -33,26 +33,51 @@ public enum Words {
         private final String path;
         private final String name;
 
-
+        /**
+         * Define a word with his type, his path and possible property
+         * @param type is type of Words
+         * @param path is path of Words
+         * @param name is possible property of Words
+         */
         Words(TypeOfWords type, String path,String name) {
                 this.type= type;
                 this.path = path;
                 this.name = name;
 
         }
+
+
+        /**
+         *
+         * @return @return a type for different Words
+         */
         public TypeOfWords getTypeOfWords(){
 
                 return this.type;
         }
 
+        /**
+         *
+         * @return a Path for different Words
+         */
+
         public String getPath(){
                 return this.path;
         }
 
+        /**
+         *
+         * @return a possible property for different Words
+         */
         public String getName(){
                 return this.name;
         }
 
+        /**
+         * Take a type and check if the type is the same as the type of the word
+         * @param type is type of Words
+         * @return true if the type is similar to the type of the word, else false
+         */
         public boolean isType(TypeOfWords type){
                 return  this.type.equals(type);
         }

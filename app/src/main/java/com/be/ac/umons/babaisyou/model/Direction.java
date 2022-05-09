@@ -1,4 +1,4 @@
-package com.be.ac.umons.babaisyou;
+package com.be.ac.umons.babaisyou.model;
 
 public enum Direction {
 
@@ -10,6 +10,11 @@ public enum Direction {
     public int x;
     public int y;
 
+    /**
+     * create a construction for a Direction
+     * @param x is coordinated abscissa
+     * @param y is coordinate orderly
+     */
     Direction(int x, int y) {
         this.x = x;
         this.y = y;

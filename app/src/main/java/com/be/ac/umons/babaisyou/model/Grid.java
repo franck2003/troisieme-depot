@@ -1,23 +1,30 @@
-package com.be.ac.umons.babaisyou;
+package com.be.ac.umons.babaisyou.model;
 
-import com.be.ac.umons.babaisyou.rules.Rule;
-import com.be.ac.umons.babaisyou.Graphique.Windows;
+import com.be.ac.umons.babaisyou.model.rules.Rule;
+import com.be.ac.umons.babaisyou.view.Windows;
 import javafx.scene.Group;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 
 import java.io.*;
-import java.security.PublicKey;
 import java.util.*;
-//import static com.be.ac.umons.babaisyou.rules.Rule.isValid;
 
 public class Grid implements theRules{
 
     Position pos;
-    private static ArrayList<Entities>[][] grid;
+    private ArrayList<Entities>[][] grid;
     private final Map<Entities, Direction> list = new HashMap<>();
+    ArrayList<Rule> rules = new ArrayList<>() ;
+    private ArrayList<Entities> controllableEntity = new ArrayList<>();
+    int p = 1;
     Stack<Map<Entities, Direction>> entities_Move = new Stack<>();
 
+    /**
+     * Create the Arraylist<Entities>[][] with the file map given in parameter, if the file name not exist : send exception to the main.
+     * @param map access path of each file in the game
+     * @throws IOException
+     */
+    @SuppressWarnings("unchecked")
     public Grid(String map) throws IOException {// constructeur qui permet de definir le plateau ou la grille qui est un tableau a 2 dimension d'entitie
         String line;
         String[] values;
@@ -51,9 +58,24 @@ public class Grid implements theRules{
         }
     }
 
+    /**
+     * apply the modification in the root if the rules contains one Rule :first a  NOUN, the second an OPERATOR and the last a NOUN
+     * @param root is a container of the scene
+     */
     @Override
     public void appliRules(Group root) {
-        ArrayList<Rule> rules = this.getRules();
+        getRules();
+        Words baba = null;
+        for(Rule rule: rules){
+            if(rule.third.equals(Words.you)){
+                baba = rule.first;
+                break;
+            }
+        }
+        if(baba == null && p == 1){
+            Windows.PlayMusic("src\\main\\resources\\Image\\game_over.wav");
+            p++;
+        }
         for (Rule args : rules) {
             if(args.third.isType(TypeOfWords.NOUN)) {
                 for (ArrayList<Entities>[] arrayLists : this.grid) {
@@ -84,33 +106,45 @@ public class Grid implements theRules{
         }
     }
 
+    /**
+     * get the grid of the game since it has been defined as being private
+     * @return grid
+     */
     public ArrayList<Entities>[][] getGrid(){
         return this.grid;
     }
 
+    /**
+     *recovers numbers of row
+     * @return grid.length number of row in the file txt
+     */
     public int getRow() {
         return this.grid.length;
     }
 
+    /**
+     *recovers numbers of cols
+     * @return grid.length number of cols in the file txt
+     */
     public int getCol() {
         return this.grid[0].length;
     }
 
+    /**
+     * iterate on each element of enum and return corresponding element according to the character String passed as parameter
+     * @param s a String
+     * @return Words
+     */
     public Words getWords(String s) {
         return Words.valueOf(s);
     }
 
-    public Entities getEntitities(int x, int y) {
-        if (this.grid[x][y] != null) {// regarder si this.grid[x][y] n'est pas nul
-            for (Entities args : this.grid[x][y]) {
-                if (args.position.row == x && args.position.col == y) {// je pense que je devrais mettre un for ici pour parcourir chaqu'entites
-                    return args;
-                }
-            }
-        }
-        return null;
-    }
-
+    /**
+     * allows remove entity in a grid on a Position
+     * @param i
+     * @param j
+     * @param entities
+     */
     public void removeEntities(int i, int j, Entities entities) {
         this.grid[i][j].remove(entities);
     }
@@ -137,8 +171,11 @@ public class Grid implements theRules{
         return list;
     }
 
-    public ArrayList<Rule> getRules() {
-        ArrayList<Rule> rules = new ArrayList<Rule>();
+    /**
+     * find all rules valid Vertical or Horizontal in the Grid
+     */
+    public void getRules() {
+        rules.clear();
         List<Entities> list = getIs();
         for (Entities second : list) {
             if(ingrid(second.position.row - 1, second.position.col) && ingrid(second.position.row+1,second.position.col)) {
@@ -157,46 +194,46 @@ public class Grid implements theRules{
                 if (this.grid[second.position.row][second.position.col - 1].size() != 0 || this.grid[second.position.row][second.position.col + 1].size() != 0) {
                     for (Entities first : this.grid[second.position.row][second.position.col - 1]) {
                         for (Entities third : this.grid[second.position.row][second.position.col + 1]) {
-                            if (Rule.isValid(first.block, second.block, third.block)) {
-                                rules.add(new Rule(first.block, second.block, third.block));
+                            addValidRules(first.block, second.block, third.block);
                             }
                         }
                     }
                 }
             }
-            for(Rule ruls:rules){
-                System.out.println(ruls.first);
-                System.out.println(ruls.second);
-                System.out.println(ruls.third);
-            }
+
+    }
+    /**
+     * Add the parameters in a valid rule : first must be a NOUN, the second an OPERATOR and the last a PROPERTY or NOUN
+     * @param first Words Which has the type NOUN
+     * @param second Words Which has the type OPERATOR
+     * @param third Words Which has the type PROPERTY or NOUN
+     */
+
+    private void addValidRules(Words first, Words second, Words third) {
+        if (Rule.isValid(first, second, third)) {
+            rules.add(new Rule(first, second, third));
         }
-        return rules;
     }
 
-
+    /**
+     * check if to coordinated is in a Grid
+     * @param i first coordinste
+     * @param j second coordinate
+     * @return true if a coordinated is in a Grid else false
+     */
     public boolean ingrid(int i, int j) {
         return i < getRow() && j < getCol() && i >= 0 && j >= 0;
     }
 
-    public boolean IsBlock(int i, int j) {
-        ArrayList<Rule> rules = getRules();
-        Words rock = null;
-        for (Rule args : rules) {
-            if (args.first.equals(Words.push)) {
-                rock = args.first;
-            }
-        }
-        for (Entities args : this.grid[i][j]) {
-            if (args.block.equals(rock)) {
-                return true;
-            }
-        }
-        return false;
-    }
 
+    /**
+     * Take a Words and, to see if he can be pushed.
+     * @param ref verify the condition with this block.
+     * @return true or false if and only if the Words is pushable.
+     */
     public boolean IsPushable(Words ref) {
         Words rock = null;
-        ArrayList<Rule> rules = this.getRules();
+        getRules();
         for (Rule args : rules) {
             if (args.third.equals(Words.push)) {
                 rock = Words.valueOf(args.first.getName().toLowerCase());
@@ -211,8 +248,18 @@ public class Grid implements theRules{
         return n.contains(ref) || ref.isType(TypeOfWords.NOUN) || ref.isType(TypeOfWords.OPERATOR);
     }
 
+
+
+    /**
+     * allows you to push entity in the grid and give a modification in the scene
+     * @param ref is entity in a Grif
+     * @param dir Direction enter by a gamer
+     * @param root the container in the scene
+     * @return true if entity has been pushed else false
+     * @throws FileNotFoundException
+     */
     public boolean push(Entities ref, Direction dir, Group root) throws FileNotFoundException {
-        ArrayList<Rule> rules = this.getRules();//this.getRules();
+        getRules();
         ArrayList<Entities> entities = new ArrayList<>();
         Words wall = null;
         Words rock = null;
@@ -256,7 +303,7 @@ public class Grid implements theRules{
                 for (Entities charac : entities) {
                     ImageView img = charac.getImageView();
                     root.getChildren().remove(img);
-                    this.grid[charac.position.row][charac.position.col].remove(charac);
+                    removeEntities(charac.position.row, charac.position.col, charac);
                 }
                 return true;
             }
@@ -272,30 +319,35 @@ public class Grid implements theRules{
             }
         }
         if(isPush){
-            this.grid[ref.position.row][ref.position.col].remove(ref);
+            removeEntities(ref.position.row, ref.position.col, ref );
             ref.position.row += dir.x;
             ref.position.col += dir.y;
-            this.grid[ref.position.row][ref.position.col].add(ref);
+            setEntities(ref.position.row, ref.position.col, ref );;
 
             ImageView img = ref.getImageView();
-            img.setTranslateX(img.getTranslateX() + (dir.x * 40));
-            img.setTranslateY(img.getTranslateY() + (dir.y * 40));
+            if(img != null){
+                img.setTranslateX(img.getTranslateX() + (dir.x * 40));
+                img.setTranslateY(img.getTranslateY() + (dir.y * 40));
+            }
+
 
         }
         return isPush;
     }
 
-
-    public void Move(Direction dir, Group root) throws FileNotFoundException {
-        ArrayList<Rule> rules = this.getRules();
+    /**
+     * check in a grid all entities controllable
+     * @return entityControllable
+     */
+    public ArrayList<Entities> ControllableEntity(){
         Words baba = null;
-
+        ArrayList<Entities> test = new ArrayList<>();
+        getRules();
         for (Rule args : rules) {
             if (args.third.equals(Words.you)) {
                 baba = Words.valueOf(args.first.getName().toLowerCase());
             }
         }
-        ArrayList<Entities> test = new ArrayList<Entities>();
         for (ArrayList<Entities>[] arrayLists : this.grid) {
             for (ArrayList<Entities> arrayList : arrayLists) {
                 if (!arrayList.isEmpty()) {
@@ -307,36 +359,43 @@ public class Grid implements theRules{
                 }
             }
         }
-        for (Entities args:test){
-            if(dir.equals(Direction.UP)) {
-                list.put(args, Direction.DOWN);
-            }
-            if(dir.equals(Direction.DOWN)) {
-                list.put(args, Direction.UP);
-            }
-            if(dir.equals(Direction.LEFT)) {
-                list.put(args, Direction.RIGHT);
-            }
-            if(dir.equals(Direction.RIGHT)) {
-                list.put(args, Direction.LEFT);
-            }
-            entities_Move.push(list);
-            push(args, dir, root);
-            list.put(args, dir);
+        return test;
+    }
+
+    /**
+     * allows you to move all entity touchy to move and apply all modification in a root
+     * @param dir is a Direction enter by the gamer
+     * @param root is a container of the scene
+     * @throws FileNotFoundException
+     */
+    public void Move(Direction dir, Group root) throws FileNotFoundException {
+        getRules();
+        controllableEntity = ControllableEntity();
+        for (Entities entities:controllableEntity){
+            push(entities, dir, root);
         }
     }
-    public void goBack(Group root) throws FileNotFoundException {
-        Map<Entities, Direction> ref = entities_Move.pop();
-        Set<Entities> entity = ref.keySet();
-        for(Entities arg:entity){
-            //push(arg, arg.)
-        }
-        Iterator<Map.Entry<Entities, Direction>> iterator = ref.entrySet().iterator();
-        while (iterator.hasNext()){
-            Map.Entry<Entities, Direction> entry = iterator.next();
-            push(entry.getKey(),entry.getValue(),root);
-        }
 
+    public void writeInFile(int i){
+        try {
+        String line ;
+        PrintWriter fw = new PrintWriter(new FileOutputStream("src\\main\\resources\\map_save\\map"+i+".txt"), true);
+        for (ArrayList<Entities>[] arrayLists : this.grid) {
+            for (ArrayList<Entities> arrayList : arrayLists) {
+                if (!arrayList.isEmpty()) {
+                    for (Entities entities : arrayList) {
+                        line = entities.block.toString()+ " "+ entities.position.row+ " " + entities.position.col+ " " + entities.dir;
+                        fw.write(line);
+                        fw.println();
+                        System.out.println(line);
+                    }
+                }
+            }
+        }
+        fw.close();
+    }catch (IOException e){
+            System.out.println("je n'ai pas trouve");
+        }
     }
 }
 
