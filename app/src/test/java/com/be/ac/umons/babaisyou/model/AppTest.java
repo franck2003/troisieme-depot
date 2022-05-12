@@ -4,6 +4,7 @@
 package com.be.ac.umons.babaisyou.model;
 import com.be.ac.umons.babaisyou.model.*;
 
+import com.be.ac.umons.babaisyou.model.rules.Rule;
 import javafx.scene.Group;
 import org.junit.jupiter.api.Test;
 
@@ -19,7 +20,7 @@ class AppTest {
         assertTrue(true);
     }
 
-    @Test void Move() throws IOException {
+    @Test void MoveUp() throws IOException {
         boolean status = true;
         try {
             Group root = new Group();
@@ -28,7 +29,72 @@ class AppTest {
             Grid old = new Grid("D:\\projet_baba_is_you_new\\app\\src\\main\\resources\\map\\map1.txt");
             ArrayList<Entities>[][] grille = grid.getGrid();
             ArrayList<Entities>[][] oldGrid = old.getGrid();
-            ArrayList<Entities> entitiesMove = grid.ControllableEntity();
+            grid.Move(dir, root);
+            System.out.println("OK");
+            if(Arrays.deepEquals(grille, oldGrid)){
+                status = false;
+            }
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        assertTrue(status);
+    }
+
+    @Test void MoveDown() throws IOException {
+        boolean status = true;
+        try {
+            Group root = new Group();
+            Direction dir = Direction.DOWN;
+            Grid grid = new Grid("D:\\projet_baba_is_you_new\\app\\src\\main\\resources\\map\\map1.txt");
+            Grid old = new Grid("D:\\projet_baba_is_you_new\\app\\src\\main\\resources\\map\\map1.txt");
+            ArrayList<Entities>[][] grille = grid.getGrid();
+            ArrayList<Entities>[][] oldGrid = old.getGrid();
+            grid.Move(dir, root);
+            System.out.println("OK");
+            if(Arrays.deepEquals(grille, oldGrid)){
+                status = false;
+            }
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        assertTrue(status);
+    }
+
+    @Test void MoveLeft() throws IOException {
+        boolean status = true;
+        try {
+            Group root = new Group();
+            Direction dir = Direction.LEFT;
+            Grid grid = new Grid("D:\\projet_baba_is_you_new\\app\\src\\main\\resources\\map\\map1.txt");
+            Grid old = new Grid("D:\\projet_baba_is_you_new\\app\\src\\main\\resources\\map\\map1.txt");
+            ArrayList<Entities>[][] grille = grid.getGrid();
+            ArrayList<Entities>[][] oldGrid = old.getGrid();
+            grid.Move(dir, root);
+            System.out.println("OK");
+            if(Arrays.deepEquals(grille, oldGrid)){
+                status = false;
+            }
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        assertTrue(status);
+    }
+
+    @Test void MoveRight() throws IOException {
+        boolean status = true;
+        try {
+            Group root = new Group();
+            Direction dir = Direction.RIGHT;
+            Grid grid = new Grid("D:\\projet_baba_is_you_new\\app\\src\\main\\resources\\map\\map1.txt");
+            Grid old = new Grid("D:\\projet_baba_is_you_new\\app\\src\\main\\resources\\map\\map1.txt");
+            ArrayList<Entities>[][] grille = grid.getGrid();
+            ArrayList<Entities>[][] oldGrid = old.getGrid();
             grid.Move(dir, root);
             System.out.println("OK");
             if(Arrays.deepEquals(grille, oldGrid)){
@@ -43,8 +109,12 @@ class AppTest {
     }
 
     @Test void numb_rules() throws IOException {
+        Group root = new Group();
+        Rule rule = new Rule();
         Grid grid = new Grid("D:\\projet_baba_is_you_new\\app\\src\\main\\resources\\map\\map1.txt");
-        grid.getRules();
+        grid.get_Rule();
         assertEquals(grid.rules.size(), 4);
     }
+
+
 }

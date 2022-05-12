@@ -1,10 +1,8 @@
 package com.be.ac.umons.babaisyou.view;
 
+import com.be.ac.umons.babaisyou.model.*;
 import com.be.ac.umons.babaisyou.model.Direction;
 import com.be.ac.umons.babaisyou.model.Entities;
-import com.be.ac.umons.babaisyou.model.Direction;
-import com.be.ac.umons.babaisyou.model.Entities;
-import com.be.ac.umons.babaisyou.model.Grid;
 import javafx.application.Application;
 import javafx.event.EventHandler;
 import javafx.geometry.HPos;
@@ -57,7 +55,9 @@ public class Windows extends Application implements EventHandler<KeyEvent> {
     public static void setI() {
          i++;
     }
+    public static void putJ(int n){j = n;}
     public static int getI(){return i;}
+    public static void putI(int p){i = p;}
 
     public void start(Stage stage) {
         this.stage = stage;
@@ -65,7 +65,7 @@ public class Windows extends Application implements EventHandler<KeyEvent> {
             root = new Group();
             //root.setPrefSize(600,600);
 
-            scene = new Scene(root, 900,800);
+            scene = new Scene(root, 800,800);
             gameMenu = new GameMenu(this);
             stage.getIcons().add(new Image("file:src\\main\\resources\\Image\\baba.png"));
             stage.setTitle("BabaIsYou!");
@@ -87,7 +87,7 @@ public class Windows extends Application implements EventHandler<KeyEvent> {
 
     public void Interface(String map) throws FileNotFoundException {
         root = new Group();
-        Scene scene = new Scene(root, 900, 800, Color.BLACK);
+        Scene scene = new Scene(root, 800, 800, Color.BLACK);
         save = new Button("SAVE");
         root.getChildren().add(save);
         try {
@@ -100,7 +100,7 @@ public class Windows extends Application implements EventHandler<KeyEvent> {
         ArrayList<Entities>[][] ref = grille.getGrid();
 
         for (int i = 0; i < ref.length; i++) {
-            for (int j = 0; j < ref[0].length; j++) {
+            for (int j = 0; j < ref[i].length; j++) {
                 for (Entities args : ref[i][j]) {
                     try {
 
@@ -126,7 +126,7 @@ public class Windows extends Application implements EventHandler<KeyEvent> {
         //stage.setIconified(true);
         stage.setScene(scene);
         save.setOnMouseClicked(event -> {
-            grille.writeInFile(Windows.getI());
+            SaveLevel.save(grille, GameMenu.name, i);
         });
         scene.setOnKeyPressed(this);
         stage.setResizable(false);// permet d'empecher l'agrandissement ou le raccourciument
@@ -199,13 +199,12 @@ public class Windows extends Application implements EventHandler<KeyEvent> {
             }
             case N -> {
                 System.out.println("N");
-                grille.writeInFile(i);
+                SaveLevel.save(grille, GameMenu.name, i);
             }
             default -> System.out.print("");
         }
 
-        grille.appliRules(root);
-
+        grille.get_Rule().appliRules(grille, root);
         if(i == j){
             root = new Group();
             j++;

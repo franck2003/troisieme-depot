@@ -9,25 +9,30 @@ public enum Words {
         text_rock(TypeOfWords.NOUN,"src\\main\\resources\\Image\\test_rock.png","rock"),
         text_wall(TypeOfWords.NOUN,"src\\main\\resources\\Image\\test_wall.png","wall"),
         text_flag(TypeOfWords.NOUN,"src\\main\\resources\\Image\\test_flag.png","flag"),
+        text_lava(TypeOfWords.NOUN,"src\\main\\resources\\Image\\kill.png","lava"),
+        kill(TypeOfWords.NOUN,"src\\main\\resources\\Image\\kill.png","lava"),
+        metal(TypeOfWords.NOUN,"src\\main\\resources\\Image\\kill.png","lava"),
         hot(TypeOfWords.NOUN,"src\\main\\resources\\Image\\hot.png","water"),
 
+        //PROPERTIES
+        you(TypeOfWords.PROPERTY,"src\\main\\resources\\Image\\you.png","you"),
+        win(TypeOfWords.PROPERTY,"src\\main\\resources\\Image\\win.png","win"),
+        stop(TypeOfWords.PROPERTY,"src\\main\\resources\\Image\\stop.png","stop"),
         push(TypeOfWords.PROPERTY,"src\\main\\resources\\Image\\push.png","push"),
+        sink(TypeOfWords.PROPERTY,"src\\main\\resources\\Image\\sink.png","wall"),
 
         // OPERATORS
         is(TypeOfWords.OPERATOR,"src\\main\\resources\\Image\\is.png",""),
 
-        // PROPERTIES
-        baba(TypeOfWords.PROPERTY,"src\\main\\resources\\Image\\baba.png","baba"),
-        water(TypeOfWords.PROPERTY,"src\\main\\resources\\Image\\water.png","water"),
-        rock(TypeOfWords.PROPERTY,"src\\main\\resources\\Image\\rock.png","rock"),
-        lava(TypeOfWords.PROPERTY,"src\\main\\resources\\Image\\lava.png","lava"),
-        you(TypeOfWords.PROPERTY,"src\\main\\resources\\Image\\you.png","you"),
-        win(TypeOfWords.PROPERTY,"src\\main\\resources\\Image\\win.png","win"),
-        stop(TypeOfWords.PROPERTY,"src\\main\\resources\\Image\\stop.png","stop"),
-        flag(TypeOfWords.PROPERTY,"src\\main\\resources\\Image\\flag.png","flag"),
-        sink(TypeOfWords.PROPERTY,"src\\main\\resources\\Image\\sink.png","water"),
-        wall(TypeOfWords.PROPERTY,"src\\main\\resources\\Image\\wall.png","wall"),
-        grass(TypeOfWords.PROPERTY,"src\\main\\resources\\Image\\grass.png","grass");
+        // MATERIAL
+        baba(TypeOfWords.MATERIAL,"src\\main\\resources\\Image\\baba.png","baba"),
+        water(TypeOfWords.MATERIAL,"src\\main\\resources\\Image\\water.png","water"),
+        rock(TypeOfWords.MATERIAL,"src\\main\\resources\\Image\\rock.png","rock"),
+        lava(TypeOfWords.MATERIAL,"src\\main\\resources\\Image\\lava.png","lava"),
+
+        flag(TypeOfWords.MATERIAL,"src\\main\\resources\\Image\\flag.png","flag"),
+        wall(TypeOfWords.MATERIAL,"src\\main\\resources\\Image\\wall.png","wall"),
+        grass(TypeOfWords.MATERIAL,"src\\main\\resources\\Image\\grass.png","grass");
 
         private final TypeOfWords type;
         private final String path;

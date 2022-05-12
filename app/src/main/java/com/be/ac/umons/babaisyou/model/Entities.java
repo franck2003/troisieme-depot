@@ -8,6 +8,7 @@ public class Entities {
     public  Position position;
     private ImageView imageView;
 
+
     /**
      * constructor for each element for each element in my Grid
      * @param block is a Words for different entity in my Grid

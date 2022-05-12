@@ -2,6 +2,7 @@ package com.be.ac.umons.babaisyou.model;
 
 import com.be.ac.umons.babaisyou.model.rules.Rule;
 import com.be.ac.umons.babaisyou.view.Windows;
+import com.sun.jdi.Value;
 import javafx.scene.Group;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -9,16 +10,20 @@ import javafx.scene.image.ImageView;
 import java.io.*;
 import java.util.*;
 
-public class Grid implements theRules{
+public class Grid {
 
     Position pos;
     private ArrayList<Entities>[][] grid;
     private final Map<Entities, Direction> list = new HashMap<>();
     ArrayList<Rule> rules = new ArrayList<>() ;
-    private ArrayList<Entities> controllableEntity = new ArrayList<>();
+    Rule rule = new Rule();
     int p = 1;
     Stack<Map<Entities, Direction>> entities_Move = new Stack<>();
+    ArrayList<Entities> list_Is = new ArrayList<>();
 
+    public Grid(){
+
+    }
     /**
      * Create the Arraylist<Entities>[][] with the file map given in parameter, if the file name not exist : send exception to the main.
      * @param map access path of each file in the game
@@ -32,22 +37,19 @@ public class Grid implements theRules{
         BufferedReader lecture = new BufferedReader(new FileReader(map));
         while ((line = lecture.readLine()) != null) {
             values = line.split(" ");
-            if (values.length == 2) {
+             if(values.length == 2) {
                 this.grid = new ArrayList[Integer.parseInt(values[0])][Integer.parseInt(values[1])];
-            } else {
+            } if(values.length == 3||values.length == 4){
                 pos = new Position(Integer.parseInt(values[1]), Integer.parseInt(values[2]));
-                if (values.length == 3) {
-                    entities = new Entities(getWords(values[0]), pos, 0);
-                    if (this.grid[Integer.parseInt(values[1])][Integer.parseInt(values[2])] == null)
-                        this.grid[Integer.parseInt(values[1])][Integer.parseInt(values[2])] = new ArrayList<Entities>();
-                    this.grid[Integer.parseInt(values[1])][Integer.parseInt(values[2])].add(entities);
-                } else {
-                    entities = new Entities(getWords(values[0]), pos, Integer.parseInt(values[3]));
-                    if (this.grid[Integer.parseInt(values[1])][Integer.parseInt(values[2])] == null)
-                        this.grid[Integer.parseInt(values[1])][Integer.parseInt(values[2])] = new ArrayList<Entities>();
-                    this.grid[Integer.parseInt(values[1])][Integer.parseInt(values[2])].add(entities);
+                int dir = values.length == 3 ? 0 : Integer.parseInt(values[3]);
+                entities = new Entities(getWords(values[0]), pos, dir);
+                if(entities.block.equals(Words.is)){
+                    list_Is.add(entities);
                 }
-            }
+                if (this.grid[Integer.parseInt(values[1])][Integer.parseInt(values[2])] == null)
+                    this.grid[Integer.parseInt(values[1])][Integer.parseInt(values[2])] = new ArrayList<Entities>();
+                this.grid[Integer.parseInt(values[1])][Integer.parseInt(values[2])].add(entities);
+                }
         }
         for (int i = 0; i < this.grid.length; i++) {
             for (int j = 0; j < this.grid[i].length; j++) {
@@ -58,52 +60,20 @@ public class Grid implements theRules{
         }
     }
 
-    /**
-     * apply the modification in the root if the rules contains one Rule :first a  NOUN, the second an OPERATOR and the last a NOUN
-     * @param root is a container of the scene
-     */
-    @Override
-    public void appliRules(Group root) {
-        getRules();
-        Words baba = null;
-        for(Rule rule: rules){
-            if(rule.third.equals(Words.you)){
-                baba = rule.first;
-                break;
-            }
-        }
-        if(baba == null && p == 1){
-            Windows.PlayMusic("src\\main\\resources\\Image\\game_over.wav");
-            p++;
-        }
-        for (Rule args : rules) {
-            if(args.third.isType(TypeOfWords.NOUN)) {
-                for (ArrayList<Entities>[] arrayLists : this.grid) {
-                    for (ArrayList<Entities> arrayList : arrayLists) {
-                        if (!arrayList.isEmpty()) {
-                            for (Entities entities : arrayList) {
-                                if (entities.block.name().equals(args.first.getName())){
-                                    Entities newEntity = new Entities(Words.valueOf(Words.valueOf(args.third.getName()).getName()), entities.position,entities.dir);
-                                    arrayList.add(newEntity);
-                                    arrayList.remove(entities);
-                                    root.getChildren().remove(entities.getImageView());
-                                    try {
-                                        Image image = new Image(new FileInputStream(newEntity.block.getPath()));
-                                        ImageView imageView = new ImageView(image);
-                                        root.getChildren().add(imageView);
-                                        newEntity.setImageView(imageView);
-                                        imageView.setTranslateX(newEntity.position.row * 40);
-                                        imageView.setTranslateY(newEntity.position.col * 40);
-                                    } catch (IOException e) {
-                                        System.out.println(e.getMessage());
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
+    public Rule get_Rule(){
+        return this.rule;
+    }
+
+    public  ArrayList<Entities> getList_Is() {
+        return this.list_Is;
+    }
+
+    public int get_P(){
+        return this.p;
+    }
+
+    public void set_P(){
+        this.p++;
     }
 
     /**
@@ -153,67 +123,6 @@ public class Grid implements theRules{
         this.grid[i][j].add(entities);
     }
 
-    public ArrayList<Entities> getIs() {
-        ArrayList<Entities> list = new ArrayList<Entities>();
-        int cpt = 0;
-        for (ArrayList<Entities>[] arrayLists : this.grid) {
-            for (ArrayList<Entities> arrayList : arrayLists) {
-                if (arrayList != null) {
-                    for (Entities args : arrayList) {
-                        if (args.block.equals(Words.is)) {
-                            list.add(args);
-                            break;
-                        }
-                    }
-                }
-            }
-        }
-        return list;
-    }
-
-    /**
-     * find all rules valid Vertical or Horizontal in the Grid
-     */
-    public void getRules() {
-        rules.clear();
-        List<Entities> list = getIs();
-        for (Entities second : list) {
-            if(ingrid(second.position.row - 1, second.position.col) && ingrid(second.position.row+1,second.position.col)) {
-                if (this.grid[second.position.row - 1][second.position.col].size() != 0 && this.grid[second.position.row + 1][second.position.col].size() != 0) {
-                    for (Entities first : this.grid[second.position.row - 1][second.position.col]) {
-                        for (Entities third : this.grid[second.position.row + 1][second.position.col]) {
-                            if (Rule.isValid(first.block, second.block, third.block)) {
-                                rules.add(new Rule(first.block, second.block, third.block));
-                                //first.getImageView().setOpacity(0.5);
-                            }
-                        }
-                    }
-                }
-            }
-            if(ingrid(second.position.row , second.position.col-1) && ingrid(second.position.row,second.position.col+1)) {
-                if (this.grid[second.position.row][second.position.col - 1].size() != 0 || this.grid[second.position.row][second.position.col + 1].size() != 0) {
-                    for (Entities first : this.grid[second.position.row][second.position.col - 1]) {
-                        for (Entities third : this.grid[second.position.row][second.position.col + 1]) {
-                            addValidRules(first.block, second.block, third.block);
-                            }
-                        }
-                    }
-                }
-            }
-
-    }
-    /**
-     * Add the parameters in a valid rule : first must be a NOUN, the second an OPERATOR and the last a PROPERTY or NOUN
-     * @param first Words Which has the type NOUN
-     * @param second Words Which has the type OPERATOR
-     * @param third Words Which has the type PROPERTY or NOUN
-     */
-
-    private void addValidRules(Words first, Words second, Words third) {
-        if (Rule.isValid(first, second, third)) {
-            rules.add(new Rule(first, second, third));
-        }
-    }
 
     /**
      * check if to coordinated is in a Grid
@@ -225,31 +134,46 @@ public class Grid implements theRules{
         return i < getRow() && j < getCol() && i >= 0 && j >= 0;
     }
 
-
-    /**
-     * Take a Words and, to see if he can be pushed.
-     * @param ref verify the condition with this block.
-     * @return true or false if and only if the Words is pushable.
-     */
-    public boolean IsPushable(Words ref) {
-        Words rock = null;
-        getRules();
-        for (Rule args : rules) {
-            if (args.third.equals(Words.push)) {
-                rock = Words.valueOf(args.first.getName().toLowerCase());
-            }
+    public ArrayList<Entities> getItemsAtPos(int i, int j){
+        if(ingrid(i, j)){
+            return this.grid[i][j];
         }
-        ArrayList<Words> n = new ArrayList<>();
-        n.add(rock);
-        n.add(Words.push);
-        n.add(Words.win);
-        n.add(Words.stop);
-        n.add(Words.you);
-        return n.contains(ref) || ref.isType(TypeOfWords.NOUN) || ref.isType(TypeOfWords.OPERATOR);
+        return null;
     }
 
+    public boolean check_Hot(Entities ref, Direction dir, Group root) throws FileNotFoundException{
+        ArrayList<Entities> entities = new ArrayList<>();
+        for (Entities args : getItemsAtPos(ref.position.row+ dir.x, ref.position.col+ dir.y)) {
+            if (chech_rules(Words.sink, args) && chech_rules(Words.push, ref) || chech_rules(Words.sink, args) && chech_rules(Words.you, ref)) {
+                entities.add(ref);
+                entities.add(args);
+                break;
+            }
+        }
+            if (entities.size() != 0) {
+                //System.out.println(entities.get(0).block);
+                //System.out.println(entities.get(1).block);
+                for (Entities charac : entities) {
+                    //System.out.println(entities.size());
+                    //System.out.println(charac.block);
+                    ImageView img = charac.getImageView();
+                    root.getChildren().remove(img);
+                    //System.out.println(this.grid[charac.position.row][]);
+                    removeEntities(charac.position.row, charac.position.col, charac);
+                }
+                return true;
+            }
+            return false;
+        }
 
-
+    public boolean chech_rules(Words words, Entities entity){
+        for (Rule args : rule.get_rules_list()) {
+            if (args.first.getName().equals(entity.block.getName()) && args.third.equals(words)){
+                return true;
+            }
+        }
+        return false;
+    }
     /**
      * allows you to push entity in the grid and give a modification in the scene
      * @param ref is entity in a Grif
@@ -259,39 +183,61 @@ public class Grid implements theRules{
      * @throws FileNotFoundException
      */
     public boolean push(Entities ref, Direction dir, Group root) throws FileNotFoundException {
-        getRules();
-        ArrayList<Entities> entities = new ArrayList<>();
-        Words wall = null;
-        Words rock = null;
-        Words flag = null;
-        Words hot = null;
-        Words baba = null;
+        ArrayList<Entities> item_on_next_pos = this.getItemsAtPos(ref.position.row+dir.x, ref.position.col+dir.y);
+        ArrayList<Entities> itemToMove = new ArrayList<Entities>();
         boolean isPush = true;
-        for (Rule args : rules) {
-            if (args.third.equals(Words.stop)) {
-                wall = Words.valueOf(args.first.getName().toLowerCase());
-            }
-            if (args.third.equals(Words.push)) {
-                rock = Words.valueOf(args.first.getName().toLowerCase());
-            }
-            if (args.third.equals(Words.you)) {
-                baba = Words.valueOf(args.first.getName().toLowerCase());
-            }
-            if(args.third.equals(Words.sink)){
-                hot = Words.valueOf(args.first.getName().toLowerCase());
-            }
-            if(args.third.equals(Words.win)){
-                flag = Words.valueOf(args.first.getName().toLowerCase());
-            }
-        }
-        if (!ingrid(ref.position.row + dir.x, ref.position.col + dir.y)) {
+        if(!ingrid(ref.position.row+dir.x, ref.position.col+dir.y)){
             return false;
         }
-        for (Entities args : this.grid[ref.position.row + dir.x][ref.position.col + dir.y]) {
+        for (Entities e : item_on_next_pos) {
+            if (chech_rules(Words.push, e) || e.block.isType(TypeOfWords.NOUN) || e.block.isType(TypeOfWords.OPERATOR) || e.block.isType(TypeOfWords.PROPERTY)) {
+                itemToMove.add(e);
+            }
+        }
+
+
+        for(Entities item:itemToMove){
+            isPush = push(item, dir, root);
+        }
+
+        if(check_Hot(ref,dir,root)){
+            return true;
+        }
+
+        for(Entities e:item_on_next_pos) {
+            if (chech_rules(Words.stop, e)){
+                return false;
+            }
+            if(chech_rules(Words.win, e) && chech_rules(Words.you, ref)){
+                System.out.println("gagne");
+                System.out.println(Windows.getI());
+                Windows.setI();
+            }
+
+        }
+        if(isPush){
+            removeEntities(ref.position.row, ref.position.col, ref );
+            ref.position.row += dir.x;
+            ref.position.col += dir.y;
+            setEntities(ref.position.row, ref.position.col, ref );
+
+            ImageView img = ref.getImageView();
+            if(img != null){
+                img.setTranslateX(img.getTranslateX() + (dir.x * 40));
+                img.setTranslateY(img.getTranslateY() + (dir.y * 40));
+            }
+        }
+
+        /*for (Entities args : this.grid[ref.position.row + dir.x][ref.position.col + dir.y]) {
             if(args.block.equals(flag) && ref.block.equals(baba)){
                 Windows.setI();
             }
-        }
+        }*/
+        return isPush;
+    }
+
+
+        /*
 
         for (Entities args : this.grid[ref.position.row + dir.x][ref.position.col + dir.y]) {
             if ((args.block.equals(hot) && ref.block.equals(baba) || (args.block.equals(hot) && ref.block.equals(rock)))) {
@@ -308,32 +254,10 @@ public class Grid implements theRules{
                 return true;
             }
         }
-        for (Entities args : this.grid[ref.position.row + dir.x][ref.position.col + dir.y]) {
-            if (args.block.equals(wall)) {
-                return false;
-            }
-        }
-        for (int i = 0; i < this.grid[ref.position.row + dir.x][ref.position.col + dir.y].size(); i++) {
-            if (this.IsPushable(this.grid[ref.position.row + dir.x][ref.position.col + dir.y].get(i).block)) {
-                isPush = push(this.grid[ref.position.row + dir.x][ref.position.col + dir.y].get(i), dir, root);
-            }
-        }
-        if(isPush){
-            removeEntities(ref.position.row, ref.position.col, ref );
-            ref.position.row += dir.x;
-            ref.position.col += dir.y;
-            setEntities(ref.position.row, ref.position.col, ref );;
 
-            ImageView img = ref.getImageView();
-            if(img != null){
-                img.setTranslateX(img.getTranslateX() + (dir.x * 40));
-                img.setTranslateY(img.getTranslateY() + (dir.y * 40));
-            }
+     */
+        //return true;
 
-
-        }
-        return isPush;
-    }
 
     /**
      * check in a grid all entities controllable
@@ -342,8 +266,8 @@ public class Grid implements theRules{
     public ArrayList<Entities> ControllableEntity(){
         Words baba = null;
         ArrayList<Entities> test = new ArrayList<>();
-        getRules();
-        for (Rule args : rules) {
+        rule.getRules(this);
+        for (Rule args : rule.get_rules_list()) {
             if (args.third.equals(Words.you)) {
                 baba = Words.valueOf(args.first.getName().toLowerCase());
             }
@@ -369,34 +293,47 @@ public class Grid implements theRules{
      * @throws FileNotFoundException
      */
     public void Move(Direction dir, Group root) throws FileNotFoundException {
-        getRules();
-        controllableEntity = ControllableEntity();
-        for (Entities entities:controllableEntity){
+        rule.getRules(this);
+        ArrayList<Entities> controllableEntity = ControllableEntity();
+        for (Entities entities: controllableEntity){
             push(entities, dir, root);
         }
     }
 
-    public void writeInFile(int i){
-        try {
-        String line ;
-        PrintWriter fw = new PrintWriter(new FileOutputStream("src\\main\\resources\\map_save\\map"+i+".txt"), true);
-        for (ArrayList<Entities>[] arrayLists : this.grid) {
-            for (ArrayList<Entities> arrayList : arrayLists) {
-                if (!arrayList.isEmpty()) {
-                    for (Entities entities : arrayList) {
-                        line = entities.block.toString()+ " "+ entities.position.row+ " " + entities.position.col+ " " + entities.dir;
-                        fw.write(line);
-                        fw.println();
-                        System.out.println(line);
-                    }
+    public void load_file(String map) throws IOException {// constructeur qui permet de definir le plateau ou la grille qui est un tableau a 2 dimension d'entitie
+        String line;
+        String[] values;
+        Entities entities;
+        BufferedReader lecture = new BufferedReader(new FileReader(map));
+        while ((line = lecture.readLine()) != null) {
+            values = line.split(" ");
+            if(values.length == 1){
+                Windows.putI(Integer.parseInt(values[0]));
+                Windows.putJ(Integer.parseInt(values[0])+1);
+            }
+            if (values.length == 2) {
+                this.grid = new ArrayList[Integer.parseInt(values[0])][Integer.parseInt(values[1])];
+            } else if(values.length == 4){
+                pos = new Position(Integer.parseInt(values[1]), Integer.parseInt(values[2]));
+                int dir = values[3].equals("0") ? 0 : Integer.parseInt(values[3]);
+                entities = new Entities(getWords(values[0]), pos, dir);
+                if(entities.block.equals(Words.is)){
+                    list_Is.add(entities);
+                }
+                if (this.grid[Integer.parseInt(values[1])][Integer.parseInt(values[2])] == null)
+                    this.grid[Integer.parseInt(values[1])][Integer.parseInt(values[2])] = new ArrayList<Entities>();
+                this.grid[Integer.parseInt(values[1])][Integer.parseInt(values[2])].add(entities);
+            }
+        }
+        for (int i = 0; i < this.grid.length; i++) {
+            for (int j = 0; j < this.grid[i].length; j++) {
+                if (this.grid[i][j] == null) {
+                    this.grid[i][j] = new ArrayList<Entities>();
                 }
             }
         }
-        fw.close();
-    }catch (IOException e){
-            System.out.println("je n'ai pas trouve");
-        }
     }
+
 }
 
 
